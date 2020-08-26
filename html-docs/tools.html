@@ -1,0 +1,942 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tools &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="Interpolation tools" href="interpolation_tools.html"/>
+        <link rel="prev" title="Rays" href="rays.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tools.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="interpolation_tools.html" class="btn btn-neutral float-right" title="Interpolation tools" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rays.html" class="btn btn-neutral" title="Rays" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-tools_functions">
+<span id="tools"></span><h1>Tools<a class="headerlink" href="#module-tools_functions" title="Permalink to this headline">¶</a></h1>
+<p>Author: Michał Porębski</p>
+<dl class="function">
+<dt id="tools_functions.angle_between">
+<code class="descclassname">tools_functions.</code><code class="descname">angle_between</code><span class="sig-paren">(</span><em>v1</em>, <em>v2</em>, <em>already_unit_vector=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#angle_between"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.angle_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the angle in radians between vectors ‘v1’ and ‘v2’</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>v1</strong> (<em>np.array</em>) – np.array[x, y]</li>
+<li><strong>v2</strong> (<em>np.array</em>) – np.array[x, y]</li>
+<li><strong>already_unit_vector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – default False, speeds up the calculations if True, but vectors have to be unit</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float) angle in radians between v1 and v2</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.calculate_acceptance_angles">
+<code class="descclassname">tools_functions.</code><code class="descname">calculate_acceptance_angles</code><span class="sig-paren">(</span><em>p1x</em>, <em>p1y</em>, <em>p2x</em>, <em>p2y</em>, <em>p3x</em>, <em>p3y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#calculate_acceptance_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.calculate_acceptance_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate acceptance angles from 3 points, p1 is beginning point, p2 and p3 are points of obstacle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p1x</strong> (<em>np.array</em>) – vector with X coordinates of points P1</li>
+<li><strong>p1y</strong> (<em>np.array</em>) – vector with Y coordinates of points P1</li>
+<li><strong>p2x</strong> (<em>np.array</em>) – vector with X coordinates of points P2</li>
+<li><strong>p2y</strong> (<em>np.array</em>) – vector with Y coordinates of points P2</li>
+<li><strong>p3x</strong> (<em>np.array</em>) – vector with X coordinates of points P3</li>
+<li><strong>p3y</strong> (<em>np.array</em>) – vector with Y coordinates of points P3</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float, float): (min_angle, max_angle)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.calculate_acceptance_angles_vectorized">
+<code class="descclassname">tools_functions.</code><code class="descname">calculate_acceptance_angles_vectorized</code><span class="sig-paren">(</span><em>p1x</em>, <em>p1y</em>, <em>p2x</em>, <em>p2y</em>, <em>p3x</em>, <em>p3y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#calculate_acceptance_angles_vectorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.calculate_acceptance_angles_vectorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate acceptance angles from coordinates vectors of 3 points, p1 is beginning point,
+p2 and p3 are points of obstacle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p1x</strong> (<em>np.array</em>) – vector with X coordinates of points P1</li>
+<li><strong>p1y</strong> (<em>np.array</em>) – vector with Y coordinates of points P1</li>
+<li><strong>p2x</strong> (<em>np.array</em>) – vector with X coordinates of points P2</li>
+<li><strong>p2y</strong> (<em>np.array</em>) – vector with Y coordinates of points P2</li>
+<li><strong>p3x</strong> (<em>np.array</em>) – vector with X coordinates of points P3</li>
+<li><strong>p3y</strong> (<em>np.array</em>) – vector with Y coordinates of points P3</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array, np.array): (min_angle, max_angle)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.construct_parabola_from_lengths">
+<code class="descclassname">tools_functions.</code><code class="descname">construct_parabola_from_lengths</code><span class="sig-paren">(</span><em>rfl</em>, <em>pfl</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#construct_parabola_from_lengths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.construct_parabola_from_lengths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ‘a’ coefficient of parabola centered in 0,0 - ax^2 + bx + c</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rfl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – reflected focal length</li>
+<li><strong>pfl</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – parent focal length</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float) ‘a’ parabola coefficient</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.does_fit_in_acceptance_angle">
+<code class="descclassname">tools_functions.</code><code class="descname">does_fit_in_acceptance_angle</code><span class="sig-paren">(</span><em>current_angle</em>, <em>min_angle</em>, <em>max_angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#does_fit_in_acceptance_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.does_fit_in_acceptance_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns flag whether current_angle fits between min and max</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>current_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>min_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>max_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(bool) flag, True if fits, False if not</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.does_fit_in_acceptance_angle_vectorized">
+<code class="descclassname">tools_functions.</code><code class="descname">does_fit_in_acceptance_angle_vectorized</code><span class="sig-paren">(</span><em>current_angle</em>, <em>min_angle</em>, <em>max_angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#does_fit_in_acceptance_angle_vectorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.does_fit_in_acceptance_angle_vectorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns truth table of angles which fits in min and max angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>current_angle</strong> (<em>np.array</em>) – np.array of current angles</li>
+<li><strong>min_angle</strong> (<em>np.array</em>) – min angle</li>
+<li><strong>max_angle</strong> (<em>np.array</em>) – max angle</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">np.array[bool] whether fits or not</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.find_intersection_with_surface">
+<code class="descclassname">tools_functions.</code><code class="descname">find_intersection_with_surface</code><span class="sig-paren">(</span><em>surf</em>, <em>line</em>, <em>x0</em>, <em>y0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#find_intersection_with_surface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.find_intersection_with_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not used, but can be used to find intersection with surface, defined by function from x and z coordinates and line</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>surf</strong> (<em>lambda</em>) – surface function which takes x and z coordinates</li>
+<li><strong>line</strong> (<em>lambda</em>) – line function which takes x coordinate</li>
+<li><strong>x0</strong> (<em>np.array</em>) – </li>
+<li><strong>y0</strong> (<em>np.array</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) point of intersection</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.find_vector_intersection_with_surface">
+<code class="descclassname">tools_functions.</code><code class="descname">find_vector_intersection_with_surface</code><span class="sig-paren">(</span><em>surf</em>, <em>angle_xy</em>, <em>angle_xz</em>, <em>starting_point</em>, <em>x0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#find_vector_intersection_with_surface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.find_vector_intersection_with_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Not used, but can be used to find intersection with surface, defined by function from x and z coordinates and line</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>surf</strong> (<em>lambda</em>) – surface function which takes x and z coordinate</li>
+<li><strong>angle_xy</strong> (<em>np.array</em>) – </li>
+<li><strong>angle_xz</strong> (<em>np.array</em>) – </li>
+<li><strong>starting_point</strong> (<em>np.array</em>) – </li>
+<li><strong>x0</strong> (<em>np.array</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) intersection points</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.generate_circle_beam">
+<code class="descclassname">tools_functions.</code><code class="descname">generate_circle_beam</code><span class="sig-paren">(</span><em>no_of_points</em>, <em>radius</em>, <em>boundary_angle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#generate_circle_beam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.generate_circle_beam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns points distributed on circles with geometrically increasing density to center and angles xy and xz, on
+outside are the biggest, linearly decreasing to the center</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>no_of_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of points</li>
+<li><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – radius of circle of distribution</li>
+<li><strong>boundary_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – maximal angle on the outside of circle</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array, np.array, np.array): points, angles_xy, angles_xz</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_2n_polynomial_root_in_domain">
+<code class="descclassname">tools_functions.</code><code class="descname">get_2n_polynomial_root_in_domain</code><span class="sig-paren">(</span><em>p2</em>, <em>p1</em>, <em>p0</em>, <em>domain</em>, <em>accuracy=1e-10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_2n_polynomial_root_in_domain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_2n_polynomial_root_in_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns solution of polynomial which fits the domain, if both roots doesn’t fit in then returns just one of them,
+returns also delta</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p2</strong> (<em>np.array</em>) – coefficient of x ** 2</li>
+<li><strong>p1</strong> (<em>np.array</em>) – coefficient of x ** 1</li>
+<li><strong>p0</strong> (<em>np.array</em>) – free number</li>
+<li><strong>domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) – range of domain (min, max)</li>
+<li><strong>accuracy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(tuple) x, delta</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_angle_from_vector">
+<code class="descclassname">tools_functions.</code><code class="descname">get_angle_from_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_angle_from_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_angle_from_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns angle defined by 2D vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vector</strong> (<em>np.array</em>) – 2D vector</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(float) angle</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_color_from_range">
+<code class="descclassname">tools_functions.</code><code class="descname">get_color_from_range</code><span class="sig-paren">(</span><em>val</em>, <em>min_v</em>, <em>max_v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_color_from_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_color_from_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns rgb color from the range, (0-1,0-1,0-1), was supposed to be for generating color from spectrum</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – value between min and max which color should be calculated for</li>
+<li><strong>min_v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – min value</li>
+<li><strong>max_v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – max value</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(tuple)(x, y, z), rgb color values, x,y,z are from 0 to 1</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_direction_vector_from_two_angles">
+<code class="descclassname">tools_functions.</code><code class="descname">get_direction_vector_from_two_angles</code><span class="sig-paren">(</span><em>angle_xy</em>, <em>angle_xz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_direction_vector_from_two_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_direction_vector_from_two_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create unit direction vector from xy and xz angles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle_xy</strong> (<em>np.array</em>) – </li>
+<li><strong>angle_xz</strong> (<em>np.array</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return (np.array) direction_vectors:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_euclidean_distance">
+<code class="descclassname">tools_functions.</code><code class="descname">get_euclidean_distance</code><span class="sig-paren">(</span><em>p1</em>, <em>p2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_euclidean_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_euclidean_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns distance between two points, works for n dimentional vectors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p1</strong> (<em>np.array</em>) – np.array[x,y, …] vector one</li>
+<li><strong>p2</strong> (<em>np.array</em>) – np.array[x,y, …] vector two</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float) distance</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_length_of_vector">
+<code class="descclassname">tools_functions.</code><code class="descname">get_length_of_vector</code><span class="sig-paren">(</span><em>v1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_length_of_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_length_of_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns euclidean length of vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v1</strong> (<em>np.array</em>) – np.array[x,y, …]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(float) length</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_xyxzangles_from_vector">
+<code class="descclassname">tools_functions.</code><code class="descname">get_xyxzangles_from_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_xyxzangles_from_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_xyxzangles_from_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns tuple of of xy and xz angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vector</strong> (<em>np.array</em>) – np.array[x, y, z] direction vector</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(float, float): (xy_angle, xz_angle)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.get_xyxzangles_from_vectors">
+<code class="descclassname">tools_functions.</code><code class="descname">get_xyxzangles_from_vectors</code><span class="sig-paren">(</span><em>vectors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#get_xyxzangles_from_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.get_xyxzangles_from_vectors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns tuple of np.arrays of xy and xz angles, where xy and xz are vectors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vectors</strong> (<em>np.array</em>) – np.array[:, [x, y, z]] direction vectors</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(np.array, np.array): (xy_angles, xz_angles)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.line_intersection_with_circle">
+<code class="descclassname">tools_functions.</code><code class="descname">line_intersection_with_circle</code><span class="sig-paren">(</span><em>p1_x</em>, <em>p1_y</em>, <em>p1_z</em>, <em>p2_x</em>, <em>p2_y</em>, <em>p2_z</em>, <em>p3</em>, <em>radius</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#line_intersection_with_circle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.line_intersection_with_circle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find two points of intersection with circle with center in p3 and radius, p1 and p2 are points of line,
+lengths of all P1 and P2 coordinates have to be the same</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>p1_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – X coordinates of P1</li>
+<li><strong>p1_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Y coordinates of P1</li>
+<li><strong>p1_z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Z coordinates of P1</li>
+<li><strong>p2_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – X coordinates of P2</li>
+<li><strong>p2_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Y coordinates of P2</li>
+<li><strong>p2_z</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Z coordinates of P2</li>
+<li><strong>p3</strong> (<em>np.array</em>) – [x, y, z], center of circle</li>
+<li><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – radius of circle</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array, np.array, np.array) two points of intersection and delta, with length of p1x</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.line_intersection_with_paraboloid">
+<code class="descclassname">tools_functions.</code><code class="descname">line_intersection_with_paraboloid</code><span class="sig-paren">(</span><em>par_coeff</em>, <em>start_p</em>, <em>dir</em>, <em>mirror_x_domain</em>, <em>mirror_y_domain</em>, <em>accuracy=1e-10</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#line_intersection_with_paraboloid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.line_intersection_with_paraboloid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find line intersection with paraboloid of center in (0,0), paraboloid constructed with equation:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">par_coeff</span>
+</pre></div>
+</div>
+<p>calculated intersection using analytical calculations, solves set of equations:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">a</span>
+<span class="n">y</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">b</span>
+<span class="n">z</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="n">z0</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="n">c</span>
+<span class="n">y</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">par_coeff</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>par_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – parabola coefficient</li>
+<li><strong>start_p</strong> (<em>np.array</em>) – [:, [x,y,z]], line starting point, have to be 2d numpy array</li>
+<li><strong>dir</strong> (<em>np.array</em>) – [:, [x,y,z]], line direction vector</li>
+<li><strong>mirror_x_domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – [min, max] domain where the mirror is defined in x axis</li>
+<li><strong>mirror_y_domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – [min, max] domain where the mirror is defined in y axis</li>
+<li><strong>accuracy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – accuracy of computations, below it, values are treated as zeroes</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">(np.array) intersection_point:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">vector with the same length as start_p with coordinates of intersection points</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">(np.array) normal_vectors:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">normal_vectors in this points</td>
+</tr>
+</tbody>
+</table>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.line_intersection_with_paraboloid_points">
+<code class="descclassname">tools_functions.</code><code class="descname">line_intersection_with_paraboloid_points</code><span class="sig-paren">(</span><em>par_coeff</em>, <em>start_p</em>, <em>dir</em>, <em>mirror_x_domain</em>, <em>mirror_y_domain</em>, <em>accuracy=1e-10</em>, <em>force_y_method=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#line_intersection_with_paraboloid_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.line_intersection_with_paraboloid_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find line intersection with paraboloid of center in 0,0, paraboloid constructed with equation:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">par_coeff</span>
+</pre></div>
+</div>
+<p>using analytical calculations, solves set of equations:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x0</span><span class="p">)</span><span class="o">/</span><span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">y0</span><span class="p">)</span><span class="o">/</span><span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="n">z0</span><span class="p">)</span><span class="o">/</span><span class="n">c</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">par_coeff</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>par_coeff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – parabola coefficient</li>
+<li><strong>start_p</strong> (<em>np.array</em>) – [:, [x,y,z]], line starting point, have to be 2d numpy array</li>
+<li><strong>dir</strong> (<em>np.array</em>) – [:, [x,y,z]], line direction vector</li>
+<li><strong>mirror_x_domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – [min, max] domain where the mirror is defined in x axis</li>
+<li><strong>mirror_y_domain</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – [min, max] domain where the mirror is defined in y axis</li>
+<li><strong>accuracy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – accuracy of computations, below it, values are treated as zeroes</li>
+<li><strong>force_y_method</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – flag to force calculations using y variable as unknown</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">(np.array) intersection_point:</th></tr>
+<tr class="field-odd field"><td>&#160;</td><td class="field-body">vector with the same length as start_p with coordinates of intersection points</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">(np.array) normal_vectors:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body">normal_vectors in this points</td>
+</tr>
+</tbody>
+</table>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.line_plane_collision">
+<code class="descclassname">tools_functions.</code><code class="descname">line_plane_collision</code><span class="sig-paren">(</span><em>plane_normal</em>, <em>plane_point</em>, <em>ray_direction</em>, <em>ray_point</em>, <em>epsilon=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#line_plane_collision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.line_plane_collision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns points of collision with plane</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>plane_normal</strong> (<em>np.array</em>) – np.array[x,y,z] normal vector of plane</li>
+<li><strong>plane_point</strong> (<em>np.array</em>) – np.array[x,y,z] point on plane</li>
+<li><strong>ray_direction</strong> (<em>np.array</em>) – np.array[x,y,z] ray direction</li>
+<li><strong>ray_point</strong> (<em>np.array</em>) – np.array[x,y,z] starting point of ray</li>
+<li><strong>epsilon</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – accuracy of parallel lines</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array[x,y,z]) point of collision</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.line_plane_collision_vectorized">
+<code class="descclassname">tools_functions.</code><code class="descname">line_plane_collision_vectorized</code><span class="sig-paren">(</span><em>plane_normal</em>, <em>plane_point</em>, <em>ray_direction</em>, <em>ray_point</em>, <em>epsilon=1e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#line_plane_collision_vectorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.line_plane_collision_vectorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns points of collision with plane</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>plane_normal</strong> (<em>np.array</em>) – np.array([x,y,z]) normal vector of plane</li>
+<li><strong>plane_point</strong> (<em>np.array</em>) – np.array([x,y,z]) point on plane</li>
+<li><strong>ray_direction</strong> (<em>np.array</em>) – np.array([:, [x,y,z]]) array with ray directions</li>
+<li><strong>ray_point</strong> (<em>np.array</em>) – np.array([:, [x,y,z]]) array of starting points of rays</li>
+<li><strong>epsilon</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – accuracy of parallel lines</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array[:, [x,y,z]]) points of collision</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.lines_intersection">
+<code class="descclassname">tools_functions.</code><code class="descname">lines_intersection</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>b1</em>, <em>b2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#lines_intersection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.lines_intersection" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://stackoverflow.com/questions/3252194/numpy-and-line-intersections">https://stackoverflow.com/questions/3252194/numpy-and-line-intersections</a>
+Returns the point of intersection of the lines passing through a2,a1 and b2,b1. can be lists of points, only 2D</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>a1</strong> (<em>np.array</em>) – np.array[x, y] a point on the first line</li>
+<li><strong>a2</strong> (<em>np.array</em>) – np.array[x, y] another point on the first line</li>
+<li><strong>b1</strong> (<em>np.array</em>) – np.array[x, y] a point on the second line</li>
+<li><strong>b2</strong> (<em>np.array</em>) – np.array[x, y] another point on the second line</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array[:, [x, y]]) intersection points</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.reflect_array_of_vectors_from_plane">
+<code class="descclassname">tools_functions.</code><code class="descname">reflect_array_of_vectors_from_plane</code><span class="sig-paren">(</span><em>rays_vector</em>, <em>plane_vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#reflect_array_of_vectors_from_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.reflect_array_of_vectors_from_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns np array of reflected vectors</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rays_vector</strong> (<em>np.array</em>) – np.array[:, [x, y, z]], rays directions</li>
+<li><strong>plane_vector</strong> (<em>np.array</em>) – np.array[x, y, z] plane normal vector</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array[:, [x, y, z]]) reflected rays</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.reflect_many_vectors_from_many_planes">
+<code class="descclassname">tools_functions.</code><code class="descname">reflect_many_vectors_from_many_planes</code><span class="sig-paren">(</span><em>rays_vectors</em>, <em>plane_vectors</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#reflect_many_vectors_from_many_planes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.reflect_many_vectors_from_many_planes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns np array of reflected vectors from many planes, defined by plane_vectors,
+lengths of both rays_vectors and plane_vectors have to be the same</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>rays_vectors</strong> (<em>np.array</em>) – np.array[:, [x, y, z]], rays directions</li>
+<li><strong>plane_vectors</strong> (<em>np.array</em>) – np.array[:, x, y, z] plane normal vectors</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array[:, [x, y, z]]) reflected rays</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.reflect_vector_from_plane">
+<code class="descclassname">tools_functions.</code><code class="descname">reflect_vector_from_plane</code><span class="sig-paren">(</span><em>ray_vector</em>, <em>plane_vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#reflect_vector_from_plane"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.reflect_vector_from_plane" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns direction vector, reflected from plane</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ray_vector</strong> (<em>np.array</em>) – np.array[x, y, z]</li>
+<li><strong>plane_vector</strong> (<em>np.array</em>) – np.array[x, y, z]</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array[x, y, z]) direction vector</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.rotation_around_z">
+<code class="descclassname">tools_functions.</code><code class="descname">rotation_around_z</code><span class="sig-paren">(</span><em>angle</em>, <em>accuracy=1e-15</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#rotation_around_z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.rotation_around_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns rotation matrix around Z axis by angle, clockwise</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>accuracy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – below accuracy zeroes the result</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) rotation_matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.side_of_line">
+<code class="descclassname">tools_functions.</code><code class="descname">side_of_line</code><span class="sig-paren">(</span><em>point_a</em>, <em>line_point_a</em>, <em>line_point_b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#side_of_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.side_of_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns on which side of line is point_a, sign is changing depending on the side</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>point_a</strong> (<em>np.array</em>) – can be numpy array of points, can be single</li>
+<li><strong>line_point_a</strong> (<em>np.array</em>) – [x,y,z] starting point of line, only one</li>
+<li><strong>line_point_b</strong> (<em>np.array</em>) – [x,y,z] starting point of line, only one</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) side numbers which define on which side are points, depending on its sign,</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="tools_functions.unit_vector">
+<code class="descclassname">tools_functions.</code><code class="descname">unit_vector</code><span class="sig-paren">(</span><em>vector</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools_functions.html#unit_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools_functions.unit_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit vector of the vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vector</strong> (<em>np.array</em>) – np.array[x, y, …]input vector</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(np.array) unit vector of original one [x, y, …]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="interpolation_tools.html" class="btn btn-neutral float-right" title="Interpolation tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rays.html" class="btn btn-neutral" title="Rays" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

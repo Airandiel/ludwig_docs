@@ -1,0 +1,5 @@
+
+HITRAN database access
+======================
+.. automodule:: behapi
+   :members: Behapi

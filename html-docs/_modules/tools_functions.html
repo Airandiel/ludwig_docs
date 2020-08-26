@@ -1,0 +1,865 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tools_functions &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>tools_functions</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tools_functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Michał Porębski</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.transform</span> <span class="k">import</span> <span class="n">Rotation</span> <span class="k">as</span> <span class="n">R</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="k">import</span> <span class="n">fsolve</span>
+<span class="kn">import</span> <span class="nn">settings</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+
+<div class="viewcode-block" id="reflect_vector_from_plane"><a class="viewcode-back" href="../tools.html#tools_functions.reflect_vector_from_plane">[docs]</a><span class="k">def</span> <span class="nf">reflect_vector_from_plane</span><span class="p">(</span><span class="n">ray_vector</span><span class="p">,</span> <span class="n">plane_vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns direction vector, reflected from plane</span>
+
+<span class="sd">    :param np.array ray_vector: np.array[x, y, z]</span>
+<span class="sd">    :param np.array plane_vector: np.array[x, y, z]</span>
+<span class="sd">    :return: (np.array[x, y, z]) direction vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ray_vector</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ray_vector</span><span class="p">,</span> <span class="n">plane_vector</span><span class="p">))</span> <span class="o">*</span> <span class="n">plane_vector</span></div>
+
+
+<div class="viewcode-block" id="reflect_array_of_vectors_from_plane"><a class="viewcode-back" href="../tools.html#tools_functions.reflect_array_of_vectors_from_plane">[docs]</a><span class="k">def</span> <span class="nf">reflect_array_of_vectors_from_plane</span><span class="p">(</span><span class="n">rays_vector</span><span class="p">,</span> <span class="n">plane_vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns np array of reflected vectors</span>
+
+<span class="sd">    :param np.array rays_vector: np.array[:, [x, y, z]], rays directions</span>
+<span class="sd">    :param np.array plane_vector: np.array[x, y, z] plane normal vector</span>
+<span class="sd">    :return: (np.array[:, [x, y, z]]) reflected rays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">rays_vector</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">rays_vector</span><span class="p">,</span> <span class="n">plane_vector</span><span class="p">),</span> <span class="n">plane_vector</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="reflect_many_vectors_from_many_planes"><a class="viewcode-back" href="../tools.html#tools_functions.reflect_many_vectors_from_many_planes">[docs]</a><span class="k">def</span> <span class="nf">reflect_many_vectors_from_many_planes</span><span class="p">(</span><span class="n">rays_vectors</span><span class="p">,</span> <span class="n">plane_vectors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns np array of reflected vectors from many planes, defined by plane_vectors,</span>
+<span class="sd">        lengths of both rays_vectors and plane_vectors have to be the same</span>
+
+<span class="sd">        :param np.array rays_vectors: np.array[:, [x, y, z]], rays directions</span>
+<span class="sd">        :param np.array plane_vectors: np.array[:, x, y, z] plane normal vectors</span>
+<span class="sd">        :return: (np.array[:, [x, y, z]]) reflected rays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">rays_vectors</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ij,ij-&gt;i&#39;</span><span class="p">,</span> <span class="n">rays_vectors</span><span class="p">,</span> <span class="n">plane_vectors</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">plane_vectors</span></div>
+    <span class="c1"># return rays_vectors - 2 * np.sum(rays_vectors * plane_vectors, axis=1)[:, np.newaxis] * plane_vectors</span>
+
+
+<div class="viewcode-block" id="get_xyxzangles_from_vector"><a class="viewcode-back" href="../tools.html#tools_functions.get_xyxzangles_from_vector">[docs]</a><span class="k">def</span> <span class="nf">get_xyxzangles_from_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns tuple of of xy and xz angle</span>
+
+<span class="sd">    :param np.array vector: np.array[x, y, z] direction vector</span>
+<span class="sd">    :return: (float, float): (xy_angle, xz_angle)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_xyxzangles_from_vectors"><a class="viewcode-back" href="../tools.html#tools_functions.get_xyxzangles_from_vectors">[docs]</a><span class="k">def</span> <span class="nf">get_xyxzangles_from_vectors</span><span class="p">(</span><span class="n">vectors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns tuple of np.arrays of xy and xz angles, where xy and xz are vectors</span>
+
+<span class="sd">    :param np.array vectors: np.array[:, [x, y, z]] direction vectors</span>
+<span class="sd">    :return: (np.array, np.array): (xy_angles, xz_angles)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">vectors</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vectors</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">vectors</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+                                                                <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vectors</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">vectors</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_angle_from_vector"><a class="viewcode-back" href="../tools.html#tools_functions.get_angle_from_vector">[docs]</a><span class="k">def</span> <span class="nf">get_angle_from_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns angle defined by 2D vector</span>
+
+<span class="sd">    :param np.array vector: 2D vector</span>
+<span class="sd">    :return: (float) angle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">vector</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">vector</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="does_fit_in_acceptance_angle"><a class="viewcode-back" href="../tools.html#tools_functions.does_fit_in_acceptance_angle">[docs]</a><span class="k">def</span> <span class="nf">does_fit_in_acceptance_angle</span><span class="p">(</span><span class="n">current_angle</span><span class="p">,</span> <span class="n">min_angle</span><span class="p">,</span> <span class="n">max_angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns flag whether current_angle fits between min and max</span>
+
+<span class="sd">    :param float current_angle:</span>
+<span class="sd">    :param float min_angle:</span>
+<span class="sd">    :param float max_angle:</span>
+<span class="sd">    :return: (bool) flag, True if fits, False if not</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">max_angle</span> <span class="o">&lt;</span> <span class="n">min_angle</span><span class="p">:</span>
+        <span class="n">fit_in</span> <span class="o">=</span> <span class="p">(</span><span class="n">current_angle</span> <span class="o">&lt;=</span> <span class="n">max_angle</span> <span class="ow">or</span> <span class="n">current_angle</span> <span class="o">&gt;=</span> <span class="n">min_angle</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fit_in</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_angle</span> <span class="o">&lt;=</span> <span class="n">current_angle</span> <span class="o">&lt;=</span> <span class="n">max_angle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fit_in</span></div>
+
+
+<div class="viewcode-block" id="does_fit_in_acceptance_angle_vectorized"><a class="viewcode-back" href="../tools.html#tools_functions.does_fit_in_acceptance_angle_vectorized">[docs]</a><span class="k">def</span> <span class="nf">does_fit_in_acceptance_angle_vectorized</span><span class="p">(</span><span class="n">current_angle</span><span class="p">,</span> <span class="n">min_angle</span><span class="p">,</span> <span class="n">max_angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns truth table of angles which fits in min and max angle</span>
+
+<span class="sd">    :param np.array current_angle: np.array of current angles</span>
+<span class="sd">    :param np.array min_angle: min angle</span>
+<span class="sd">    :param np.array max_angle: max angle</span>
+<span class="sd">    :return: np.array[bool] whether fits or not</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fit_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">min_angle</span> <span class="o">&lt;=</span> <span class="n">current_angle</span><span class="p">,</span> <span class="n">max_angle</span> <span class="o">&gt;=</span> <span class="n">current_angle</span><span class="p">)</span>
+    <span class="n">fit_in</span><span class="p">[</span><span class="n">max_angle</span> <span class="o">&lt;</span> <span class="n">min_angle</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">current_angle</span><span class="p">[</span><span class="n">max_angle</span> <span class="o">&lt;</span> <span class="n">min_angle</span><span class="p">]</span> <span class="o">&lt;=</span>
+                                                  <span class="n">max_angle</span><span class="p">[</span><span class="n">max_angle</span> <span class="o">&lt;</span> <span class="n">min_angle</span><span class="p">],</span>
+                                                  <span class="n">current_angle</span><span class="p">[</span><span class="n">max_angle</span> <span class="o">&lt;</span> <span class="n">min_angle</span><span class="p">]</span> <span class="o">&gt;=</span>
+                                                  <span class="n">min_angle</span><span class="p">[</span><span class="n">max_angle</span> <span class="o">&lt;</span> <span class="n">min_angle</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">fit_in</span></div>
+
+
+<div class="viewcode-block" id="line_plane_collision"><a class="viewcode-back" href="../tools.html#tools_functions.line_plane_collision">[docs]</a><span class="k">def</span> <span class="nf">line_plane_collision</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">ray_direction</span><span class="p">,</span> <span class="n">ray_point</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns points of collision with plane</span>
+
+<span class="sd">    :param np.array plane_normal: np.array[x,y,z] normal vector of plane</span>
+<span class="sd">    :param np.array plane_point: np.array[x,y,z] point on plane</span>
+<span class="sd">    :param np.array ray_direction: np.array[x,y,z] ray direction</span>
+<span class="sd">    :param np.array ray_point: np.array[x,y,z] starting point of ray</span>
+<span class="sd">    :param float epsilon: accuracy of parallel lines</span>
+<span class="sd">    :return: (np.array[x,y,z]) point of collision</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ndotu</span> <span class="o">=</span> <span class="n">plane_normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ndotu</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;no intersection or line is within plane&quot;</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">ray_point</span> <span class="o">-</span> <span class="n">plane_point</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="o">-</span><span class="n">plane_normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">/</span> <span class="n">ndotu</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ndotu</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">psi</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">si</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">ray_direction</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">+</span>
+               <span class="n">plane_point</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plane_point</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">psi</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">+</span> <span class="p">(</span><span class="n">si</span> <span class="o">*</span> <span class="n">ray_direction</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">+</span> <span class="n">plane_point</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">psi</span></div>
+
+
+<div class="viewcode-block" id="line_plane_collision_vectorized"><a class="viewcode-back" href="../tools.html#tools_functions.line_plane_collision_vectorized">[docs]</a><span class="k">def</span> <span class="nf">line_plane_collision_vectorized</span><span class="p">(</span><span class="n">plane_normal</span><span class="p">,</span> <span class="n">plane_point</span><span class="p">,</span> <span class="n">ray_direction</span><span class="p">,</span> <span class="n">ray_point</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns points of collision with plane</span>
+
+<span class="sd">    :param np.array plane_normal: np.array([x,y,z]) normal vector of plane</span>
+<span class="sd">    :param np.array plane_point: np.array([x,y,z]) point on plane</span>
+<span class="sd">    :param np.array ray_direction: np.array([:, [x,y,z]]) array with ray directions</span>
+<span class="sd">    :param np.array ray_point: np.array([:, [x,y,z]]) array of starting points of rays</span>
+<span class="sd">    :param float epsilon: accuracy of parallel lines</span>
+<span class="sd">    :return: (np.array[:, [x,y,z]]) points of collision</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ndotu</span> <span class="o">=</span> <span class="n">plane_normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ray_direction</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+    <span class="n">ndotu</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">ndotu</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span><span class="p">]</span> <span class="o">=</span> <span class="n">epsilon</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">ray_point</span> <span class="o">-</span> <span class="n">plane_point</span>
+    <span class="n">si</span> <span class="o">=</span> <span class="o">-</span><span class="n">plane_normal</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span> <span class="o">/</span> <span class="n">ndotu</span>
+    <span class="n">psi</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span> <span class="o">+</span> <span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">ray_direction</span><span class="p">)</span> <span class="o">+</span>
+           <span class="n">plane_point</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">plane_point</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">psi</span></div>
+
+
+<div class="viewcode-block" id="calculate_acceptance_angles"><a class="viewcode-back" href="../tools.html#tools_functions.calculate_acceptance_angles">[docs]</a><span class="k">def</span> <span class="nf">calculate_acceptance_angles</span><span class="p">(</span><span class="n">p1x</span><span class="p">,</span> <span class="n">p1y</span><span class="p">,</span> <span class="n">p2x</span><span class="p">,</span> <span class="n">p2y</span><span class="p">,</span> <span class="n">p3x</span><span class="p">,</span> <span class="n">p3y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate acceptance angles from 3 points, p1 is beginning point, p2 and p3 are points of obstacle</span>
+
+<span class="sd">    :param np.array p1x: vector with X coordinates of points P1</span>
+<span class="sd">    :param np.array p1y: vector with Y coordinates of points P1</span>
+<span class="sd">    :param np.array p2x: vector with X coordinates of points P2</span>
+<span class="sd">    :param np.array p2y: vector with Y coordinates of points P2</span>
+<span class="sd">    :param np.array p3x: vector with X coordinates of points P3</span>
+<span class="sd">    :param np.array p3y: vector with Y coordinates of points P3</span>
+<span class="sd">    :return: (float, float): (min_angle, max_angle)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="n">p2y</span> <span class="o">-</span> <span class="n">p1y</span><span class="p">),</span> <span class="p">(</span><span class="n">p2x</span> <span class="o">-</span> <span class="n">p1x</span><span class="p">))</span>
+    <span class="n">max_angle</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">atan2</span><span class="p">((</span><span class="n">p3y</span> <span class="o">-</span> <span class="n">p1y</span><span class="p">),</span> <span class="p">(</span><span class="n">p3x</span> <span class="o">-</span> <span class="n">p1x</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">min_angle</span> <span class="o">&gt;</span> <span class="n">max_angle</span><span class="p">:</span>
+        <span class="n">min_angle</span><span class="p">,</span> <span class="n">max_angle</span> <span class="o">=</span> <span class="n">max_angle</span><span class="p">,</span> <span class="n">min_angle</span>
+    <span class="k">if</span> <span class="n">min_angle</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">min_angle</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">if</span> <span class="n">max_angle</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">max_angle</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">return</span> <span class="n">min_angle</span><span class="p">,</span> <span class="n">max_angle</span></div>
+
+
+<div class="viewcode-block" id="calculate_acceptance_angles_vectorized"><a class="viewcode-back" href="../tools.html#tools_functions.calculate_acceptance_angles_vectorized">[docs]</a><span class="k">def</span> <span class="nf">calculate_acceptance_angles_vectorized</span><span class="p">(</span><span class="n">p1x</span><span class="p">,</span> <span class="n">p1y</span><span class="p">,</span> <span class="n">p2x</span><span class="p">,</span> <span class="n">p2y</span><span class="p">,</span> <span class="n">p3x</span><span class="p">,</span> <span class="n">p3y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate acceptance angles from coordinates vectors of 3 points, p1 is beginning point,</span>
+<span class="sd">        p2 and p3 are points of obstacle</span>
+
+<span class="sd">        :param np.array p1x: vector with X coordinates of points P1</span>
+<span class="sd">        :param np.array p1y: vector with Y coordinates of points P1</span>
+<span class="sd">        :param np.array p2x: vector with X coordinates of points P2</span>
+<span class="sd">        :param np.array p2y: vector with Y coordinates of points P2</span>
+<span class="sd">        :param np.array p3x: vector with X coordinates of points P3</span>
+<span class="sd">        :param np.array p3y: vector with Y coordinates of points P3</span>
+<span class="sd">        :return: (np.array, np.array): (min_angle, max_angle)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">((</span><span class="n">p2y</span> <span class="o">-</span> <span class="n">p1y</span><span class="p">),</span> <span class="p">(</span><span class="n">p2x</span> <span class="o">-</span> <span class="n">p1x</span><span class="p">))</span>
+    <span class="n">max_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">((</span><span class="n">p3y</span> <span class="o">-</span> <span class="n">p1y</span><span class="p">),</span> <span class="p">(</span><span class="n">p3x</span> <span class="o">-</span> <span class="n">p1x</span><span class="p">))</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">min_angle</span> <span class="o">&gt;</span> <span class="n">max_angle</span>
+    <span class="n">min_angle</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">max_angle</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_angle</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">min_angle</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">min_angle</span><span class="p">[</span><span class="n">min_angle</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">max_angle</span><span class="p">[</span><span class="n">max_angle</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="k">return</span> <span class="n">min_angle</span><span class="p">,</span> <span class="n">max_angle</span></div>
+
+
+<div class="viewcode-block" id="unit_vector"><a class="viewcode-back" href="../tools.html#tools_functions.unit_vector">[docs]</a><span class="k">def</span> <span class="nf">unit_vector</span><span class="p">(</span><span class="n">vector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the unit vector of the vector.</span>
+
+<span class="sd">    :param np.array vector: np.array[x, y, ...]input vector</span>
+<span class="sd">    :return: (np.array) unit vector of original one [x, y, ...]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># print(vector / np.linalg.norm(vector, axis=1).reshape((len(vector), 1)))</span>
+        <span class="k">return</span> <span class="n">vector</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">vector</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># return vector / np.sum(vector, axis=1)[:, np.newaxis]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">vector</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="angle_between"><a class="viewcode-back" href="../tools.html#tools_functions.angle_between">[docs]</a><span class="k">def</span> <span class="nf">angle_between</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">,</span> <span class="n">already_unit_vector</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the angle in radians between vectors &#39;v1&#39; and &#39;v2&#39;</span>
+
+<span class="sd">    :param np.array v1: np.array[x, y]</span>
+<span class="sd">    :param np.array v2: np.array[x, y]</span>
+<span class="sd">    :param bool already_unit_vector: default False, speeds up the calculations if True, but vectors have to be unit</span>
+<span class="sd">    :return: (float) angle in radians between v1 and v2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">already_unit_vector</span><span class="p">:</span>
+        <span class="n">v1</span> <span class="o">=</span> <span class="n">unit_vector</span><span class="p">(</span><span class="n">v1</span><span class="p">)</span>
+        <span class="n">v2</span> <span class="o">=</span> <span class="n">unit_vector</span><span class="p">(</span><span class="n">v2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_color_from_range"><a class="viewcode-back" href="../tools.html#tools_functions.get_color_from_range">[docs]</a><span class="k">def</span> <span class="nf">get_color_from_range</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">min_v</span><span class="p">,</span> <span class="n">max_v</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns rgb color from the range, (0-1,0-1,0-1), was supposed to be for generating color from spectrum</span>
+
+<span class="sd">    :param float val: value between min and max which color should be calculated for</span>
+<span class="sd">    :param float min_v: min value</span>
+<span class="sd">    :param float max_v: max value</span>
+<span class="sd">    :return: (tuple)(x, y, z), rgb color values, x,y,z are from 0 to 1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">min_v</span> <span class="o">&gt;</span> <span class="n">max_v</span><span class="p">:</span>
+        <span class="n">min_v</span><span class="p">,</span> <span class="n">max_v</span> <span class="o">=</span> <span class="n">max_v</span><span class="p">,</span> <span class="n">min_v</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="mi">999999</span> <span class="o">*</span> <span class="p">((</span><span class="n">val</span> <span class="o">-</span> <span class="n">min_v</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_v</span> <span class="o">-</span> <span class="n">min_v</span><span class="p">))</span>
+    <span class="c1"># return (&quot;(&quot; + f&quot;{(val % 100) / 100:.4f}&quot; + &quot;, &quot; +</span>
+    <span class="c1">#         f&quot;{((val // 100) % 100) / 100:.4f}&quot; + &quot;, &quot; +</span>
+    <span class="c1">#         f&quot;{((val // 10000) % 100) / 100:.4f}&quot; + &quot;)&quot;)</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">val</span> <span class="o">//</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="p">((</span><span class="n">val</span> <span class="o">//</span> <span class="mi">100</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="p">(</span><span class="n">val</span> <span class="o">//</span> <span class="mi">1</span> <span class="o">%</span> <span class="mi">100</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span></div>
+
+
+<div class="viewcode-block" id="get_euclidean_distance"><a class="viewcode-back" href="../tools.html#tools_functions.get_euclidean_distance">[docs]</a><span class="k">def</span> <span class="nf">get_euclidean_distance</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns distance between two points, works for n dimentional vectors</span>
+
+<span class="sd">    :param np.array p1: np.array[x,y, ...] vector one</span>
+<span class="sd">    :param np.array p2: np.array[x,y, ...] vector two</span>
+<span class="sd">    :return: (float) distance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a_min_b</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ij,ij-&gt;i&quot;</span><span class="p">,</span> <span class="n">a_min_b</span><span class="p">,</span> <span class="n">a_min_b</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_length_of_vector"><a class="viewcode-back" href="../tools.html#tools_functions.get_length_of_vector">[docs]</a><span class="k">def</span> <span class="nf">get_length_of_vector</span><span class="p">(</span><span class="n">v1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns euclidean length of vector</span>
+
+<span class="sd">    :param np.array v1: np.array[x,y, ...]</span>
+<span class="sd">    :return: (float) length</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a_min_b</span> <span class="o">=</span> <span class="n">v1</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ij,ij-&gt;i&quot;</span><span class="p">,</span> <span class="n">a_min_b</span><span class="p">,</span> <span class="n">a_min_b</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="generate_circle_beam"><a class="viewcode-back" href="../tools.html#tools_functions.generate_circle_beam">[docs]</a><span class="k">def</span> <span class="nf">generate_circle_beam</span><span class="p">(</span><span class="n">no_of_points</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">boundary_angle</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns points distributed on circles with geometrically increasing density to center and angles xy and xz, on</span>
+<span class="sd">    outside are the biggest, linearly decreasing to the center</span>
+
+<span class="sd">    :param int no_of_points: number of points</span>
+<span class="sd">    :param float radius: radius of circle of distribution</span>
+<span class="sd">    :param float boundary_angle: maximal angle on the outside of circle</span>
+<span class="sd">    :returns: (np.array, np.array, np.array): points, angles_xy, angles_xz</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">no_in_section</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">no_of_points</span><span class="p">))</span>
+    <span class="n">no_of_divisions</span> <span class="o">=</span> <span class="n">no_in_section</span>
+    <span class="n">rotations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">no_of_divisions</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">no_of_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">points</span><span class="p">[:</span><span class="n">no_in_section</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="n">radius</span><span class="p">,</span> <span class="n">no_in_section</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">directions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">no_of_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">directions</span><span class="p">[:</span><span class="n">no_in_section</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">boundary_angle</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">no_in_section</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">ang</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rotations</span><span class="p">):</span>
+        <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">R</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">(</span><span class="n">ang</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>  <span class="c1"># rotation matrix</span>
+        <span class="n">points</span><span class="p">[</span><span class="n">index</span> <span class="o">*</span> <span class="n">no_in_section</span><span class="p">:</span> <span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">no_in_section</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">points</span><span class="p">[:</span><span class="n">no_in_section</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="n">directions</span><span class="p">[</span><span class="n">index</span> <span class="o">*</span> <span class="n">no_in_section</span><span class="p">:</span> <span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">no_in_section</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">rotation_matrix</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="n">directions</span><span class="p">[:</span><span class="n">no_in_section</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">angles_xy</span> <span class="o">=</span> <span class="n">directions</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">angles_xz</span> <span class="o">=</span> <span class="n">directions</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">angles_xy</span><span class="p">,</span> <span class="n">angles_xz</span></div>
+
+
+<div class="viewcode-block" id="lines_intersection"><a class="viewcode-back" href="../tools.html#tools_functions.lines_intersection">[docs]</a><span class="k">def</span> <span class="nf">lines_intersection</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    https://stackoverflow.com/questions/3252194/numpy-and-line-intersections</span>
+<span class="sd">    Returns the point of intersection of the lines passing through a2,a1 and b2,b1. can be lists of points, only 2D</span>
+
+<span class="sd">    :param np.array a1: np.array[x, y] a point on the first line</span>
+<span class="sd">    :param np.array a2: np.array[x, y] another point on the first line</span>
+<span class="sd">    :param np.array b1: np.array[x, y] a point on the second line</span>
+<span class="sd">    :param np.array b2: np.array[x, y] another point on the second line</span>
+<span class="sd">    :return: (np.array[:, [x, y]]) intersection points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">b1</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">a1</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="n">b1</span><span class="p">],</span> <span class="n">a1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">([</span><span class="n">b2</span><span class="p">],</span> <span class="n">a1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">a1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))))</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">a2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">a2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))))</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">b1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">b1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))))</span>
+    <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">b2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">b2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))))</span>
+    <span class="c1"># b1 = np.append(b1, 1).transpose()</span>
+    <span class="c1"># b2 = np.append(b2, 1).transpose()</span>
+    <span class="c1"># print(a1.shape)</span>
+    <span class="c1"># s = np.vstack([a1, a2, b1, b2])     # s for stacked</span>
+    <span class="c1"># h = np.hstack((s, np.ones((4, 1))))     # h for homogeneous</span>
+    <span class="c1"># h = np.hstack((a1, a2))</span>
+    <span class="n">l1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>  <span class="c1"># get first line</span>
+    <span class="n">l2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>  <span class="c1"># get second line</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">)</span>  <span class="c1"># point of intersection</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">][</span><span class="n">z</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)])</span>
+    <span class="c1"># data[:, :2][z == 0] = np.array([1e100, 0])</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">][</span><span class="n">z</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">][</span><span class="n">z</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">][</span><span class="n">z</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">][</span><span class="n">z</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">][</span><span class="n">z</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">][</span><span class="n">z</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="line_intersection_with_circle"><a class="viewcode-back" href="../tools.html#tools_functions.line_intersection_with_circle">[docs]</a><span class="k">def</span> <span class="nf">line_intersection_with_circle</span><span class="p">(</span><span class="n">p1_x</span><span class="p">,</span> <span class="n">p1_y</span><span class="p">,</span> <span class="n">p1_z</span><span class="p">,</span> <span class="n">p2_x</span><span class="p">,</span> <span class="n">p2_y</span><span class="p">,</span> <span class="n">p2_z</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find two points of intersection with circle with center in p3 and radius, p1 and p2 are points of line,</span>
+<span class="sd">    lengths of all P1 and P2 coordinates have to be the same</span>
+
+<span class="sd">    :param float p1_x: X coordinates of P1</span>
+<span class="sd">    :param float p1_y: Y coordinates of P1</span>
+<span class="sd">    :param float p1_z: Z coordinates of P1</span>
+<span class="sd">    :param float p2_x: X coordinates of P2</span>
+<span class="sd">    :param float p2_y: Y coordinates of P2</span>
+<span class="sd">    :param float p2_z: Z coordinates of P2</span>
+<span class="sd">    :param np.array p3: [x, y, z], center of circle</span>
+<span class="sd">    :param float radius: radius of circle</span>
+<span class="sd">    :returns: (np.array, np.array, np.array) two points of intersection and delta, with length of p1x</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">p2_x</span> <span class="o">-</span> <span class="n">p1_x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2_y</span> <span class="o">-</span> <span class="n">p1_y</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2_z</span> <span class="o">-</span> <span class="n">p1_z</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">((</span><span class="n">p2_x</span> <span class="o">-</span> <span class="n">p1_x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1_x</span> <span class="o">-</span> <span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2_y</span> <span class="o">-</span> <span class="n">p1_y</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">p1_y</span> <span class="o">-</span> <span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2_z</span> <span class="o">-</span> <span class="n">p1_z</span><span class="p">)</span> <span class="o">*</span>
+             <span class="p">(</span><span class="n">p1_z</span> <span class="o">-</span> <span class="n">p3</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p3</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p1_x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p1_y</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">p1_z</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> \
+        <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">p1_x</span> <span class="o">+</span> <span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">p1_y</span> <span class="o">+</span> <span class="n">p3</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">p1_z</span><span class="p">)</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">b</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">a</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="n">delta</span><span class="p">[</span><span class="n">delta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">u1</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">u2</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">b</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">xu1</span> <span class="o">=</span> <span class="n">p1_x</span> <span class="o">+</span> <span class="n">u1</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2_x</span> <span class="o">-</span> <span class="n">p1_x</span><span class="p">)</span>
+    <span class="n">yu1</span> <span class="o">=</span> <span class="n">p1_y</span> <span class="o">+</span> <span class="n">u1</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2_y</span> <span class="o">-</span> <span class="n">p1_y</span><span class="p">)</span>
+    <span class="n">zu1</span> <span class="o">=</span> <span class="n">p1_z</span> <span class="o">+</span> <span class="n">u1</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2_z</span> <span class="o">-</span> <span class="n">p1_z</span><span class="p">)</span>
+    <span class="n">xu2</span> <span class="o">=</span> <span class="n">p1_x</span> <span class="o">+</span> <span class="n">u2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2_x</span> <span class="o">-</span> <span class="n">p1_x</span><span class="p">)</span>
+    <span class="n">yu2</span> <span class="o">=</span> <span class="n">p1_y</span> <span class="o">+</span> <span class="n">u2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2_y</span> <span class="o">-</span> <span class="n">p1_y</span><span class="p">)</span>
+    <span class="n">zu2</span> <span class="o">=</span> <span class="n">p1_z</span> <span class="o">+</span> <span class="n">u2</span> <span class="o">*</span> <span class="p">(</span><span class="n">p2_z</span> <span class="o">-</span> <span class="n">p1_z</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xu1</span><span class="p">,</span> <span class="n">yu1</span><span class="p">,</span> <span class="n">zu1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xu2</span><span class="p">,</span> <span class="n">yu2</span><span class="p">,</span> <span class="n">zu2</span><span class="p">]),</span> <span class="n">delta</span></div>
+
+
+<div class="viewcode-block" id="side_of_line"><a class="viewcode-back" href="../tools.html#tools_functions.side_of_line">[docs]</a><span class="k">def</span> <span class="nf">side_of_line</span><span class="p">(</span><span class="n">point_a</span><span class="p">,</span> <span class="n">line_point_a</span><span class="p">,</span> <span class="n">line_point_b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns on which side of line is point_a, sign is changing depending on the side</span>
+
+<span class="sd">    :param np.array point_a: can be numpy array of points, can be single</span>
+<span class="sd">    :param np.array line_point_a: [x,y,z] starting point of line, only one</span>
+<span class="sd">    :param np.array line_point_b: [x,y,z] starting point of line, only one</span>
+<span class="sd">    :return: (np.array) side numbers which define on which side are points, depending on its sign,</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">point_a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">point_a</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_point_b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> \
+               <span class="p">(</span><span class="n">point_a</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_point_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">point_a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_point_b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> \
+               <span class="p">(</span><span class="n">point_a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_point_b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_point_a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="construct_parabola_from_lengths"><a class="viewcode-back" href="../tools.html#tools_functions.construct_parabola_from_lengths">[docs]</a><span class="k">def</span> <span class="nf">construct_parabola_from_lengths</span><span class="p">(</span><span class="n">rfl</span><span class="p">,</span> <span class="n">pfl</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns &#39;a&#39; coefficient of parabola centered in 0,0 - ax^2 + bx + c</span>
+
+<span class="sd">    :param float rfl: reflected focal length</span>
+<span class="sd">    :param float pfl: parent focal length</span>
+<span class="sd">    :return: (float) &#39;a&#39; parabola coefficient</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pfl</span> <span class="o">/</span> <span class="p">(</span><span class="n">rfl</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="find_intersection_with_surface"><a class="viewcode-back" href="../tools.html#tools_functions.find_intersection_with_surface">[docs]</a><span class="k">def</span> <span class="nf">find_intersection_with_surface</span><span class="p">(</span><span class="n">surf</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Not used, but can be used to find intersection with surface, defined by function from x and z coordinates and line</span>
+
+<span class="sd">    :param lambda surf: surface function which takes x and z coordinates</span>
+<span class="sd">    :param lambda line: line function which takes x coordinate</span>
+<span class="sd">    :param np.array x0:</span>
+<span class="sd">    :param np.array y0:</span>
+<span class="sd">    :return: (np.array) point of intersection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_line_from_vector</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">,</span> <span class="n">angle_xz</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">)</span> <span class="o">+</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                          <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle_xz</span><span class="p">)</span> <span class="o">+</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">fsolve</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">surf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">-</span> <span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="p">)</span></div>
+    <span class="c1"># return fsolve(lambda y: fsolve(lambda x: surf(x, y) - line(x), x0), y0)</span>
+
+
+<div class="viewcode-block" id="find_vector_intersection_with_surface"><a class="viewcode-back" href="../tools.html#tools_functions.find_vector_intersection_with_surface">[docs]</a><span class="k">def</span> <span class="nf">find_vector_intersection_with_surface</span><span class="p">(</span><span class="n">surf</span><span class="p">,</span> <span class="n">angle_xy</span><span class="p">,</span> <span class="n">angle_xz</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Not used, but can be used to find intersection with surface, defined by function from x and z coordinates and line</span>
+
+<span class="sd">    :param lambda surf: surface function which takes x and z coordinate</span>
+<span class="sd">    :param np.array angle_xy:</span>
+<span class="sd">    :param np.array angle_xz:</span>
+<span class="sd">    :param np.array starting_point:</span>
+<span class="sd">    :param np.array x0:</span>
+<span class="sd">    :return: (np.array) intersection points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">line_y</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">starting_point</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">)</span> <span class="o">+</span> <span class="n">starting_point</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">line_val_y</span> <span class="o">=</span> <span class="n">line_y</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">line_z</span><span class="p">(</span><span class="n">angle_xz</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">starting_point</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle_xz</span><span class="p">)</span> <span class="o">+</span> <span class="n">starting_point</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">line_val_z</span> <span class="o">=</span> <span class="n">line_z</span><span class="p">(</span><span class="n">angle_xz</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fsolve</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">surf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">line_val_z</span><span class="p">(</span><span class="n">x</span><span class="p">))[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_val_y</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="line_intersection_with_paraboloid"><a class="viewcode-back" href="../tools.html#tools_functions.line_intersection_with_paraboloid">[docs]</a><span class="k">def</span> <span class="nf">line_intersection_with_paraboloid</span><span class="p">(</span><span class="n">par_coeff</span><span class="p">,</span> <span class="n">start_p</span><span class="p">,</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">mirror_x_domain</span><span class="p">,</span> <span class="n">mirror_y_domain</span><span class="p">,</span>
+                                      <span class="n">accuracy</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">tools_parabola_intersection_accuracy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find line intersection with paraboloid of center in (0,0), paraboloid constructed with equation::</span>
+
+<span class="sd">        y = (x**2 + z**2) * par_coeff</span>
+
+<span class="sd">    calculated intersection using analytical calculations, solves set of equations::</span>
+
+<span class="sd">        x(t) = x0 + t * a</span>
+<span class="sd">        y(t) = y0 + t * b</span>
+<span class="sd">        z(t) = z0 + t * c</span>
+<span class="sd">        y(t) = (x**2(t) + z**2(t)) * par_coeff</span>
+
+<span class="sd">    :param float par_coeff: parabola coefficient</span>
+<span class="sd">    :param np.array start_p: [:, [x,y,z]], line starting point, have to be 2d numpy array</span>
+<span class="sd">    :param np.array dir: [:, [x,y,z]], line direction vector</span>
+<span class="sd">    :param list mirror_x_domain: [min, max] domain where the mirror is defined in x axis</span>
+<span class="sd">    :param list mirror_y_domain: [min, max] domain where the mirror is defined in y axis</span>
+<span class="sd">    :param float accuracy: accuracy of computations, below it, values are treated as zeroes</span>
+<span class="sd">    :returns:</span>
+<span class="sd">        :(np.array) intersection_point: vector with the same length as start_p with coordinates of intersection points</span>
+<span class="sd">        :(np.array) normal_vectors: normal_vectors in this points</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">par_coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">par_coeff</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">start_p</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">start_p</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">start_p</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">t2_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">t1_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">z0</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span>
+    <span class="n">t0_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="n">x0</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">y0</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">t1_c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">t2_c</span> <span class="o">*</span> <span class="n">t0_c</span><span class="p">))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="o">-</span> <span class="n">t1_c</span> <span class="o">+</span> <span class="n">delta</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">t2_c</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">a</span> <span class="o">*</span> <span class="n">t</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">t</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z0</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">t</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">mirror_x_domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">mirror_x_domain</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">mirror_y_domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="n">mirror_y_domain</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="c1"># if not fit in ranges, than take the second</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="o">-</span> <span class="n">t1_c</span> <span class="o">-</span> <span class="n">delta</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">t2_c</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">y</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">y0</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">z</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">z0</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+    <span class="c1"># if ray is perpendicular to X axis</span>
+    <span class="c1"># vertical_mask = np.logical_and(a &lt; accuracy, c &lt; accuracy)</span>
+    <span class="n">vertical_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">a</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">accuracy</span><span class="p">)</span>
+    <span class="n">z_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">c</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">c</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">accuracy</span><span class="p">)</span>
+    <span class="n">vertical_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">vertical_mask</span><span class="p">,</span> <span class="n">z_mask</span><span class="p">)</span>
+    <span class="c1"># vertical_mask = a &lt; accuracy</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span>
+    <span class="n">z</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">z0</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="n">t0_c</span> <span class="o">/</span> <span class="n">t1_c</span><span class="p">)[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span>
+    <span class="n">y</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z</span><span class="p">[</span><span class="n">vertical_mask</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">par_coeff</span>
+    <span class="n">normal_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span> <span class="o">*</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="n">z</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">normal_vector</span> <span class="o">=</span> <span class="n">unit_vector</span><span class="p">(</span><span class="o">-</span><span class="n">normal_vector</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span> <span class="n">normal_vector</span></div>
+
+
+<div class="viewcode-block" id="line_intersection_with_paraboloid_points"><a class="viewcode-back" href="../tools.html#tools_functions.line_intersection_with_paraboloid_points">[docs]</a><span class="k">def</span> <span class="nf">line_intersection_with_paraboloid_points</span><span class="p">(</span><span class="n">par_coeff</span><span class="p">,</span> <span class="n">start_p</span><span class="p">,</span> <span class="nb">dir</span><span class="p">,</span> <span class="n">mirror_x_domain</span><span class="p">,</span> <span class="n">mirror_y_domain</span><span class="p">,</span>
+                                             <span class="n">accuracy</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
+                                             <span class="n">force_y_method</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find line intersection with paraboloid of center in 0,0, paraboloid constructed with equation::</span>
+
+<span class="sd">            y = (x**2 + z**2) * par_coeff</span>
+
+<span class="sd">        using analytical calculations, solves set of equations::</span>
+
+<span class="sd">            (x-x0)/a = (y-y0)/b = (z-z0)/c</span>
+<span class="sd">            y = (x**2 + z**2) * par_coeff</span>
+
+<span class="sd">        :param float par_coeff: parabola coefficient</span>
+<span class="sd">        :param np.array start_p: [:, [x,y,z]], line starting point, have to be 2d numpy array</span>
+<span class="sd">        :param np.array dir: [:, [x,y,z]], line direction vector</span>
+<span class="sd">        :param list mirror_x_domain: [min, max] domain where the mirror is defined in x axis</span>
+<span class="sd">        :param list mirror_y_domain: [min, max] domain where the mirror is defined in y axis</span>
+<span class="sd">        :param float accuracy: accuracy of computations, below it, values are treated as zeroes</span>
+<span class="sd">        :param bool force_y_method: flag to force calculations using y variable as unknown</span>
+<span class="sd">        :returns:</span>
+<span class="sd">            :(np.array) intersection_point: vector with the same length as start_p with coordinates of intersection points</span>
+<span class="sd">            :(np.array) normal_vectors: normal_vectors in this points</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">par_coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">par_coeff</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">start_p</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">start_p</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">start_p</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="nb">dir</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="c1"># firstly x</span>
+    <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">accuracy</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force_y_method</span><span class="p">:</span>
+        <span class="n">x2_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">c</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">x1_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">z0</span> <span class="o">/</span> <span class="n">a</span> <span class="o">-</span> <span class="n">c</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">/</span> <span class="n">a</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span>
+        <span class="n">x0_c</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">*</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span> <span class="o">-</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">/</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">/</span> <span class="n">a</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">z0</span><span class="p">)</span> <span class="o">+</span> <span class="n">z0</span><span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">get_2n_polynomial_root_in_domain</span><span class="p">(</span><span class="n">x2_c</span><span class="p">,</span> <span class="n">x1_c</span><span class="p">,</span> <span class="n">x0_c</span><span class="p">,</span> <span class="n">mirror_x_domain</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="n">a</span> <span class="o">+</span> <span class="n">z0</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="n">b</span> <span class="o">/</span> <span class="n">a</span> <span class="o">+</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y2_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">y1_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">z0</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">y0_c</span> <span class="o">=</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="p">(</span><span class="n">y0</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">c</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">y0</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">z0</span><span class="p">)</span> <span class="o">/</span> <span class="n">b</span> <span class="o">+</span> <span class="n">x0</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">z0</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">get_2n_polynomial_root_in_domain</span><span class="p">(</span><span class="n">y2_c</span><span class="p">,</span> <span class="n">y1_c</span><span class="p">,</span> <span class="n">y0_c</span><span class="p">,</span> <span class="n">mirror_y_domain</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span> <span class="o">/</span> <span class="n">b</span> <span class="o">+</span> <span class="n">x0</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span> <span class="o">/</span> <span class="n">b</span> <span class="o">+</span> <span class="n">z0</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">mirror_x_domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">mirror_x_domain</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="n">z_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">z</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">,</span> <span class="n">z</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">accuracy</span><span class="p">)</span>
+    <span class="n">z</span><span class="p">[</span><span class="n">z_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">z_mask</span><span class="p">])))</span>
+
+    <span class="n">normal_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span> <span class="o">*</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))),</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">par_coeff</span> <span class="o">*</span> <span class="n">z</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="c1"># print(normal_vector.shape)</span>
+    <span class="n">normal_vector</span> <span class="o">=</span> <span class="n">unit_vector</span><span class="p">(</span><span class="n">normal_vector</span><span class="p">)</span>
+    <span class="c1"># normal_vector[:, 2] = normal_vector1[:, 2]</span>
+    <span class="c1"># xs = np.arange(mirror_x_domain[0], mirror_x_domain[1], 0.1)</span>
+    <span class="c1"># zs = np.linspace(-25, 25, len(xs))</span>
+    <span class="c1"># plt.figure()</span>
+    <span class="c1"># plt.plot(xs, zs**2*par_coeff)</span>
+    <span class="c1"># plt.scatter(start_p[:, 0],start_p[:, 2], color=&#39;r&#39;)</span>
+    <span class="c1"># plt.scatter(start_p[:, 0] + dir[:, 0],start_p[:, 2]+ dir[:, 2], color=&#39;y&#39;)</span>
+    <span class="c1"># plt.scatter(x, z, color=&#39;g&#39;)</span>
+    <span class="c1"># # plt.scatter(mirror_x_domain, [0,0], color=&#39;r&#39;)</span>
+    <span class="c1"># plt.scatter(x+normal_vector[:, 0],z+normal_vector[:, 2], color=&#39;b&#39;)</span>
+    <span class="c1"># plt.show()</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">(),</span> <span class="n">normal_vector</span></div>
+
+
+<div class="viewcode-block" id="rotation_around_z"><a class="viewcode-back" href="../tools.html#tools_functions.rotation_around_z">[docs]</a><span class="k">def</span> <span class="nf">rotation_around_z</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">accuracy</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">tools_rotation_accuracy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns rotation matrix around Z axis by angle, clockwise</span>
+
+<span class="sd">    :param float angle:</span>
+<span class="sd">    :param float accuracy: below accuracy zeroes the result</span>
+<span class="sd">    :return: (np.array) rotation_matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">),</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">rotation_matrix</span> <span class="o">&gt;</span> <span class="o">-</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">rotation_matrix</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">)</span>
+    <span class="n">rotation_matrix</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">rotation_matrix</span></div>
+
+
+<div class="viewcode-block" id="get_2n_polynomial_root_in_domain"><a class="viewcode-back" href="../tools.html#tools_functions.get_2n_polynomial_root_in_domain">[docs]</a><span class="k">def</span> <span class="nf">get_2n_polynomial_root_in_domain</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">accuracy</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns solution of polynomial which fits the domain, if both roots doesn&#39;t fit in then returns just one of them,</span>
+<span class="sd">    returns also delta</span>
+
+<span class="sd">    :param np.array p2: coefficient of x ** 2</span>
+<span class="sd">    :param np.array p1: coefficient of x ** 1</span>
+<span class="sd">    :param np.array p0: free number</span>
+<span class="sd">    :param tuple domain: range of domain (min, max)</span>
+<span class="sd">    :param float accuracy:</span>
+<span class="sd">    :return: (tuple) x, delta</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">p1</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">p2</span> <span class="o">*</span> <span class="n">p0</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">((</span><span class="o">-</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">delta</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">domain</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">longdouble</span><span class="p">(</span><span class="o">-</span> <span class="n">p1</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p2</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+    <span class="n">x</span><span class="p">[</span><span class="n">p2</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">p0</span><span class="p">[</span><span class="n">p2</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">]</span> <span class="o">/</span> <span class="n">p1</span><span class="p">[</span><span class="n">p2</span> <span class="o">&lt;</span> <span class="n">accuracy</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">delta</span></div>
+
+
+<div class="viewcode-block" id="get_direction_vector_from_two_angles"><a class="viewcode-back" href="../tools.html#tools_functions.get_direction_vector_from_two_angles">[docs]</a><span class="k">def</span> <span class="nf">get_direction_vector_from_two_angles</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">,</span> <span class="n">angle_xz</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create unit direction vector from xy and xz angles</span>
+
+<span class="sd">    :param np.array angle_xy:</span>
+<span class="sd">    :param np.array angle_xz:</span>
+<span class="sd">    :return (np.array) direction_vectors:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ray_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">angle_xz</span><span class="p">)</span>
+    <span class="n">ray_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">angle_xz</span><span class="p">)</span>
+    <span class="n">ray_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">angle_xz</span><span class="p">)</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ray_x</span><span class="p">,</span> <span class="n">ray_y</span><span class="p">,</span> <span class="n">ray_z</span><span class="p">])</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="c1"># print(unit_vector(vec))</span>
+    <span class="k">return</span> <span class="n">unit_vector</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span></div>
+    <span class="c1"># return vec</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

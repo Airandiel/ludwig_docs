@@ -1,0 +1,581 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Optical elements &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="Rays" href="rays.html"/>
+        <link rel="prev" title="Transmission line" href="transmission_line.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Optical elements</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/transmission_line_obj.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="rays.html" class="btn btn-neutral float-right" title="Rays" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="transmission_line.html" class="btn btn-neutral" title="Transmission line" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-transmission_line_obj">
+<span id="optical-elements"></span><h1>Optical elements<a class="headerlink" href="#module-transmission_line_obj" title="Permalink to this headline">¶</a></h1>
+<p>Author: Michał Porębski
+Transmission line is made of different components, in this module they are implemented:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Vacuum</li>
+<li>Air</li>
+<li>FlatMirror</li>
+<li>ParabolicMirror</li>
+<li>Window</li>
+<li>Spherical lens</li>
+<li>Screen</li>
+<li><dl class="first docutils">
+<dt>Prism</dt>
+<dd><ul class="first last">
+<li>PrismZnSe</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>All components inherit from TransmissionObject class. New components can be easily added by overriding the methods of
+parent class. Main assumptions:</p>
+<blockquote>
+<div><ul class="simple">
+<li>angle is angle of rotation of element</li>
+<li>default paths to characteristics are defined in settings file</li>
+<li>lengths are in millimeters</li>
+</ul>
+</div></blockquote>
+<dl class="class">
+<dt id="transmission_line_obj.TransmissionObject">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">TransmissionObject</code><span class="sig-paren">(</span><em>kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parent class of all transmission objects.</p>
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.add_normal_vector_to_mirror">
+<code class="descname">add_normal_vector_to_mirror</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.add_normal_vector_to_mirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.add_normal_vector_to_mirror" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds normal vector to object, in key “normal_vector”</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">none,</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.calculate_acceptance_angle">
+<code class="descname">calculate_acceptance_angle</code><span class="sig-paren">(</span><em>return_min_max=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.calculate_acceptance_angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.calculate_acceptance_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates acceptance angle for obj, can return minimal and maximal angle if needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>return_min_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – if True than returns min and max angles</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(float, float): (min_angle, max_angle)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.construct_obj">
+<code class="descname">construct_obj</code><span class="sig-paren">(</span><em>current_angle</em>, <em>current_x</em>, <em>current_y</em>, <em>current_z</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.construct_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.construct_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct object, edits obj.coordinates, obj.position, obj.angle, obj.normal_vector, default is for
+vacuum</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>current_angle</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – </li>
+<li><strong>current_x</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – </li>
+<li><strong>current_y</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – </li>
+<li><strong>current_z</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.draw">
+<code class="descname">draw</code><span class="sig-paren">(</span><em>current_angle</em>, <em>current_x</em>, <em>current_y</em>, <em>ax</em>, <em>plot_type='3d'</em>, <em>plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.draw" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws object on canvas ax, changes current_angle, x and y for construction whole transmission line</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>current_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>current_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>current_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>ax</strong> (<em>plt.axis</em>) – </li>
+<li><strong>plot_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) – 3d or 2d depends on the need</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – boolean flag if you want to plot sth or not</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(float, float, float): current_angle, current_x, current_y</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.get_transformation">
+<code class="descname">get_transformation</code><span class="sig-paren">(</span><em>total_atmosphere_length</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.get_transformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.get_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns callable spectrum transformation, air edit total_atmosphere_length by adding the length of itself,
+total_atmosphere_length have to be list with fist element containing current length</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>total_atmosphere_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(callable) transmission_characteristics</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.interact_with_obj_vectorized">
+<code class="descname">interact_with_obj_vectorized</code><span class="sig-paren">(</span><em>rays</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.interact_with_obj_vectorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.interact_with_obj_vectorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Geometrical interaction with Rays obj, returns truth table which rays fit and which doesn’t, edits
+some parameters of Rays obj</p>
+<blockquote>
+<div><ul class="simple">
+<li>position,</li>
+<li>angles_xy,</li>
+<li>angles_xz,</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rays</strong> (<a class="reference internal" href="rays.html#transmission_line.Rays" title="transmission_line.Rays"><em>Rays</em></a>) – Rays obj</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(boolean np.array) np.array of length len(rays.positions)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.load_spectrum_characteristic">
+<code class="descname">load_spectrum_characteristic</code><span class="sig-paren">(</span><em>path='default'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.load_spectrum_characteristic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.load_spectrum_characteristic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads characteristics in form of function in which we can pass values to get</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) – if different than “default” then it is used as path to read characteristics</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">none</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.plot_cross_section_on_obj">
+<code class="descname">plot_cross_section_on_obj</code><span class="sig-paren">(</span><em>ax</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.plot_cross_section_on_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.plot_cross_section_on_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot obj cross section, canvas on input</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ax</strong> (<em>(</em><em>plt.axis</em><em>)</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(plt.axis) ax</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.set_distances_and_characteristics">
+<code class="descname">set_distances_and_characteristics</code><span class="sig-paren">(</span><em>previous_obj=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.set_distances_and_characteristics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.set_distances_and_characteristics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function for setting distances from previous element, used for calculating acceptance angles and loading
+spectrum characteristics</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>previous_obj</strong> (<a class="reference internal" href="#transmission_line_obj.TransmissionObject" title="transmission_line_obj.TransmissionObject"><em>TransmissionObject</em></a>) – previous object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line_obj.TransmissionObject.transform_energies_vectorized">
+<code class="descname">transform_energies_vectorized</code><span class="sig-paren">(</span><em>rays</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#TransmissionObject.transform_energies_vectorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.TransmissionObject.transform_energies_vectorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms energies of rays with objects reflectance/transmission characteristic</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rays</strong> (<a class="reference internal" href="rays.html#transmission_line.Rays" title="transmission_line.Rays"><em>Rays</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.Vacuum">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">Vacuum</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#Vacuum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.Vacuum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Vacuum is vacuum, not very complicated</dt>
+<dd>-length - length of object in milimiters</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.Air">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">Air</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#Air"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.Air" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Air component:</dt>
+<dd><p class="first">has unique refractive index function and energies transform, in this function it is just adding its length to total
+- length of itself to length traveled by rays in atmosphere.</p>
+<p class="last">Inherits from vacuum methods for drawing and constructing transmission line</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.FlatMirror">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">FlatMirror</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#FlatMirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.FlatMirror" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Flat mirror,</dt>
+<dd><p class="first">-diameter</p>
+<p class="last">-angle - does not have relative angle, angle defines the rotation from zero rotation, in angle = 0 it is
+perpendicular to X axis</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.ParabolicMirror">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">ParabolicMirror</code><span class="sig-paren">(</span><em>relative_angle_deg: float = None</em>, <em>relative_angle: float = 0</em>, <em>rfl: float = None</em>, <em>pfl: float = None</em>, <em>mirrored: bool = False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#ParabolicMirror"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.ParabolicMirror" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Parabolic Mirrors:</dt>
+<dd><p class="first">needs reflected focal length, and parent focal length,
+-rfl - reflected focal length</p>
+<p>-pfl - parent focal length</p>
+<p>-relative_angle - can rotate component according to beam, in default its placed 90 degrees to the beam
+relative angle is added to this angle, takes angle in radians</p>
+<p>-relative_angle_deg - allows for giving value in degrees</p>
+<p class="last">-mirrored - is a flag which rotates the component by 180 degrees, to be able to easy component placement
+according to its role, when True it will collimate beam if starting in focus point, when False it will focus beam,
+In 2D view of line the dot on the end of parabola is the higher value mirror end, where parabola, has higher value.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="transmission_line_obj.ParabolicMirror.make_paraboloid">
+<code class="descname">make_paraboloid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#ParabolicMirror.make_paraboloid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.ParabolicMirror.make_paraboloid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs paraboloid, calculates the parabola coefficient, makes domains, where the mirror is defined in
+paraboloid coordinate system, have some unused stuff, which can be used later.
+:return: (np.array, callable) coords, paraboloid_value</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.SphericalLens">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">SphericalLens</code><span class="sig-paren">(</span><em>focal_length: float = 0</em>, <em>relative_angle: float = 0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#SphericalLens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.SphericalLens" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Spherical lens:</dt>
+<dd><p class="first">not sure if works properly, needs checking, works like ideal lens, can be turned on the correct intersections,
+now have intersection with plane, intersection with circle is implemented and tested
+-focal_length - focal length of lens</p>
+<p class="last">-diameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.Prism">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">Prism</code><span class="sig-paren">(</span><em>construction_angle_deg: float = None</em>, <em>construction_angle: float = 0</em>, <em>relative_angle_deg: float = None</em>, <em>relative_angle: float = 0</em>, <em>thickness: float = 0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#Prism"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.Prism" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Prism:</dt>
+<dd><p class="first">-construction_angle - prism contruction angle in radians</p>
+<p>-construction_angle_deg - prism contruction angle in degrees</p>
+<p>-relative_angle - in default is perpendicular, can be rotated, in radians</p>
+<p>-relative_angle_deg - relative rotation in degrees</p>
+<p>-thickness - Z axis thickness</p>
+<p class="last">-length - length of one side, the first attack side</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="transmission_line_obj.PrismZnSe">
+<em class="property">class </em><code class="descclassname">transmission_line_obj.</code><code class="descname">PrismZnSe</code><span class="sig-paren">(</span><em>construction_angle_deg: float = None</em>, <em>construction_angle: float = 0</em>, <em>relative_angle_deg: float = None</em>, <em>relative_angle: float = 0</em>, <em>thickness: float = 0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line_obj.html#PrismZnSe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line_obj.PrismZnSe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Prism Zinc Selenide:</dt>
+<dd>From Prism it’s different with refractive index and spectrum transformation</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rays.html" class="btn btn-neutral float-right" title="Rays" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="transmission_line.html" class="btn btn-neutral" title="Transmission line" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,819 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>transmission_line &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>transmission_line</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for transmission_line</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Michał Porębski</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">colors</span>
+<span class="kn">import</span> <span class="nn">matplotlib.cm</span> <span class="k">as</span> <span class="nn">cmx</span>
+<span class="kn">import</span> <span class="nn">matplotlib.tri</span> <span class="k">as</span> <span class="nn">mtri</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">refle_interpolation</span> <span class="k">as</span> <span class="nn">interpol</span>
+<span class="kn">import</span> <span class="nn">shapely</span>
+
+<span class="kn">from</span> <span class="nn">transmission_line_obj</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">input_gen</span>
+<span class="kn">import</span> <span class="nn">settings</span>
+<span class="kn">import</span> <span class="nn">tools_functions</span> <span class="k">as</span> <span class="nn">tools</span>
+<span class="kn">from</span> <span class="nn">behapi</span> <span class="k">import</span> <span class="n">Behapi</span>
+
+
+<div class="viewcode-block" id="TransmissionLine"><a class="viewcode-back" href="../transmission_line.html#transmission_line.TransmissionLine">[docs]</a><span class="k">class</span> <span class="nc">TransmissionLine</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main class which instance is optical transmission line through which we can pass rays, represented by list of</span>
+<span class="sd">    optical elements. All lengths are in millimeters, angles usually can be put in degrees of radians</span>
+
+<span class="sd">    Example of use::</span>
+
+<span class="sd">        line = TransmissionLine([</span>
+<span class="sd">            Air(length=50.8),</span>
+<span class="sd">            ParabolicMirror(diameter=50.8, rfl=50.8, pfl=25.4, relative_angle_deg=0, mirrored=True),</span>
+<span class="sd">            Air(length=70),</span>
+<span class="sd">            ParabolicMirror(diameter=50.8, rfl=50.8, pfl=25.4, relative_angle_deg=0, mirrored=False),</span>
+<span class="sd">            Air(length=2 * 50.8),</span>
+<span class="sd">            ParabolicMirror(diameter=50.8, rfl=50.8, pfl=25.4, relative_angle_deg=0, mirrored=True),</span>
+<span class="sd">            Air(length=90),</span>
+<span class="sd">            PrismZnSe(length=50, construction_angle_deg=27, angle_to_beam_deg=17, thickness=40),</span>
+<span class="sd">            Air(length=50.8),</span>
+<span class="sd">            ParabolicMirror(diameter=50.8, rfl=50.8, pfl=25.4, relative_angle_deg=0, mirrored=False),</span>
+<span class="sd">            Air(length=50.8),</span>
+<span class="sd">            Screen(diameter=12.8, height=0.5, relative_angle_deg=-38 - 23)</span>
+<span class="sd">        ])</span>
+<span class="sd">        line.update()</span>
+<span class="sd">        ax = line.plot(plot_type=settings.plot_type)</span>
+<span class="sd">        plt.show()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">beginning</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total_length</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># def __init__(self, **kwargs):</span>
+    <span class="c1">#     self.beginning = np.array([0, 0, 0])</span>
+    <span class="c1">#     self.mirrors = []</span>
+    <span class="c1">#     self.total_length = 0</span>
+    <span class="c1">#</span>
+    <span class="c1">#     super().__init__(kwargs)</span>
+
+<div class="viewcode-block" id="TransmissionLine.plot"><a class="viewcode-back" href="../transmission_line.html#transmission_line.TransmissionLine.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method which produce new Matplotlib figure, if plot_type == &#39;3d&#39; then plot will be 3d and all elements will be</span>
+<span class="sd">        plotted with such perspective, otherwise all elements will be in 2d</span>
+
+<span class="sd">        :param string plot_type: can be &#39;3d&#39; or &#39;2d&#39;</span>
+<span class="sd">        :return: (pyplot axis) canvas for plotting</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_angle</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+            <span class="c1"># ax = plt.axes(projection=&quot;3d&quot;)</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">Axes3D</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim3d</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_x_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_x_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim3d</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_y_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_y_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim3d</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_z_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_z_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plot_type</span> <span class="o">=</span> <span class="s1">&#39;2d&#39;</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_x_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_x_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_y_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_axis_y_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">current_angle</span><span class="p">,</span> <span class="n">current_x</span><span class="p">,</span> <span class="n">current_y</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">current_angle</span><span class="p">,</span> <span class="n">current_x</span><span class="p">,</span> <span class="n">current_y</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+    <span class="c1"># def plot2d(self):</span>
+    <span class="c1">#</span>
+    <span class="c1">#     current_x = 0</span>
+    <span class="c1">#     current_y = 0</span>
+    <span class="c1">#     current_angle = 0</span>
+    <span class="c1">#     ax = object</span>
+    <span class="c1">#     fig = plt.figure()</span>
+    <span class="c1">#     ax = plt.axes()</span>
+    <span class="c1">#     for obj in self:</span>
+    <span class="c1">#         current_angle, current_x, current_y = obj.draw(current_angle, current_x, current_y, ax, &#39;2d&#39;, True)</span>
+    <span class="c1">#     ax.axis([settings.plot_axis_x_range[0], settings.plot_axis_x_range[1],</span>
+    <span class="c1">#              settings.plot_axis_y_range[0], settings.plot_axis_y_range[1]])</span>
+    <span class="c1">#     return ax</span>
+
+<div class="viewcode-block" id="TransmissionLine.update"><a class="viewcode-back" href="../transmission_line.html#transmission_line.TransmissionLine.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate positions and angles of all elements of line</span>
+
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_angle</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">previous_obj</span> <span class="o">=</span> <span class="n">TransmissionObject</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">current_angle</span><span class="p">,</span> <span class="n">current_x</span><span class="p">,</span> <span class="n">current_y</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">construct_obj</span><span class="p">(</span>
+                <span class="n">current_angle</span><span class="p">,</span> <span class="n">current_x</span><span class="p">,</span> <span class="n">current_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beginning</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">set_distances_and_characteristics</span><span class="p">(</span><span class="n">previous_obj</span><span class="p">)</span>
+            <span class="n">previous_obj</span> <span class="o">=</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="TransmissionLine.get_transformation_of_whole_line"><a class="viewcode-back" href="../transmission_line.html#transmission_line.TransmissionLine.get_transformation_of_whole_line">[docs]</a>    <span class="k">def</span> <span class="nf">get_transformation_of_whole_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns spectrum transformation of whole line, for certain wavelengths, not tested on unsorted data</span>
+
+<span class="sd">        :param np.array wavelength: usually spectrum wavelengths, from min to max</span>
+<span class="sd">        :return: (np.array) spectrum transformation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wavelength</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">spectrum</span> <span class="o">*=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_transformation</span><span class="p">(</span><span class="n">length</span><span class="p">)(</span><span class="n">wavelength</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_length</span> <span class="o">=</span> <span class="n">length</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">air_rays_air_interaction</span><span class="p">:</span>
+            <span class="n">char</span> <span class="o">=</span> <span class="n">Behapi</span><span class="p">(</span><span class="n">temperature_celsius</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">air_temperature_celsius</span><span class="p">,</span>
+                          <span class="n">pressure_pa</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">air_pressure_pa</span><span class="p">,</span>
+                          <span class="n">relative_humidity</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">air_relative_humidity</span><span class="p">,</span> <span class="n">atmosphere</span><span class="o">=</span><span class="s1">&#39;air&#39;</span><span class="p">)</span>
+            <span class="n">char</span><span class="o">.</span><span class="n">absorption_coefficient</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;sdvoigt&#39;</span><span class="p">,</span> <span class="n">wavelength_range_um</span><span class="o">=</span><span class="p">[</span><span class="n">settings</span><span class="o">.</span><span class="n">wav_min</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">wav_max</span><span class="p">],</span>
+                                        <span class="n">wavelength_step_um</span><span class="o">=</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">wav_max</span> <span class="o">-</span> <span class="n">settings</span><span class="o">.</span><span class="n">wav_min</span><span class="p">)</span> <span class="o">/</span>
+                                                           <span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span><span class="p">)</span>
+
+            <span class="n">air_transmission</span> <span class="o">=</span> <span class="n">char</span><span class="o">.</span><span class="n">transmittance</span><span class="p">(</span><span class="n">distance_cm</span><span class="o">=</span><span class="n">length</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">10</span><span class="p">,</span>
+                                                  <span class="n">desired_wavelengths</span><span class="o">=</span><span class="n">wavelength</span><span class="p">)</span>
+            <span class="n">spectrum</span> <span class="o">*=</span> <span class="n">air_transmission</span>
+        <span class="k">return</span> <span class="n">spectrum</span></div></div>
+
+    <span class="c1"># def retrieve_mirrors(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     DEPRECATED</span>
+    <span class="c1">#     Old method for getting list of only mirrors, should be deleted</span>
+    <span class="c1">#</span>
+    <span class="c1">#     :return: (list) mirrors</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     return self.mirrors</span>
+    <span class="c1"># return [obj for obj in self if obj.type == &quot;Mirror&quot;]</span>
+
+    <span class="c1"># def find_acceptance_angles_of_system(self, accuracy=1000, starting_point=np.array([0, 0, 0])):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     DEPRECATED</span>
+    <span class="c1">#     Iterative way of finding acceptance angles, by bisecting them,</span>
+    <span class="c1">#</span>
+    <span class="c1">#     :param int accuracy: number of bisections</span>
+    <span class="c1">#     :param np.array starting_point:</span>
+    <span class="c1">#     :return:</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     # min_angle, max_angle = self.mirrors[0].calculate_acceptance_angle(True)</span>
+    <span class="c1">#     max_angle = math.atan2(self.mirrors[-1].diameter / 2, self.total_length)</span>
+    <span class="c1">#     min_angle = - max_angle</span>
+    <span class="c1">#     print(&quot;max angle: &quot;, max_angle)</span>
+    <span class="c1">#     first_mirror_pos = self.mirrors[0].position</span>
+    <span class="c1">#     middle_angle = math.atan2(first_mirror_pos[1] - starting_point[1], first_mirror_pos[0] - starting_point[0])</span>
+    <span class="c1">#     max_xy_angle = self.bisect_the_angles(middle_angle, max_angle, accuracy, starting_point)</span>
+    <span class="c1">#     min_xy_angle = self.bisect_the_angles(middle_angle, abs(min_angle), accuracy, starting_point,</span>
+    <span class="c1">#                                           look_in_negative=True)</span>
+    <span class="c1">#     print(&quot;total length &quot;, self.total_length)</span>
+    <span class="c1">#     minmax_xz_angle = math.atan2(self.mirrors[-1].diameter / 2, self.total_length)</span>
+    <span class="c1">#     return min_xy_angle, max_xy_angle, minmax_xz_angle</span>
+
+    <span class="c1"># def bisect_the_angles(self, min_angle, max_angle, accuracy, starting_point, look_in_negative=False):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     DEPRECATED method for bisecting angles</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     if not look_in_negative:</span>
+    <span class="c1">#         for i in range(accuracy):</span>
+    <span class="c1">#             middle_angle = (max_angle + min_angle) / 2</span>
+    <span class="c1">#             new_ray = Ray(</span>
+    <span class="c1">#                 position=starting_point, angleXY=middle_angle, angleXZ=0)</span>
+    <span class="c1">#             trace = new_ray.trace()</span>
+    <span class="c1">#</span>
+    <span class="c1">#             if len(trace) == len(Ray.mirrors) + 1:</span>
+    <span class="c1">#                 min_angle = middle_angle</span>
+    <span class="c1">#             else:</span>
+    <span class="c1">#                 max_angle = middle_angle</span>
+    <span class="c1">#         return (max_angle + min_angle) / 2</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         for i in range(accuracy):</span>
+    <span class="c1">#             middle_angle = (max_angle + min_angle) / 2</span>
+    <span class="c1">#             new_ray = Ray(</span>
+    <span class="c1">#                 position=starting_point, angleXY=-middle_angle, angleXZ=0)</span>
+    <span class="c1">#             trace = new_ray.trace()</span>
+    <span class="c1">#             if len(trace) == len(Ray.mirrors) + 1:</span>
+    <span class="c1">#                 min_angle = middle_angle</span>
+    <span class="c1">#             else:</span>
+    <span class="c1">#                 max_angle = middle_angle</span>
+    <span class="c1">#         return -(max_angle + min_angle) / 2</span>
+
+
+<div class="viewcode-block" id="Rays"><a class="viewcode-back" href="../rays.html#transmission_line.Rays">[docs]</a><span class="k">class</span> <span class="nc">Rays</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class which create rays which travels through transmission line.</span>
+<span class="sd">        - angleXZ - angle between ray and X axis, a bit differently than in spherical coordinates, from -pi/2 to pi/2, when 0 then is parallel to X axis</span>
+<span class="sd">        - angleXY - angle like in spherical coordinates</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        ax = line.plot(plot_type=settings.plot_type) # get canvas for plotting, line is TransmissionLine instance</span>
+<span class="sd">        rays = Rays(transmission_line=line)     # line is TransmissionLine instance</span>
+<span class="sd">        num_of_rays = 1000</span>
+<span class="sd">        anglexy = np.random.uniform(-0.2, 0.2, num_of_rays)</span>
+<span class="sd">        anglexz = np.random.uniform(-0.1, 0.1, num_of_rays)</span>
+<span class="sd">        positions, anglexy, anglexz = tools.generate_circle_beam(num_of_rays, 0.002, 0.1)</span>
+<span class="sd">        rays.add_rays(positions=np.zeros([num_of_rays, 3]), anglexy=anglexy, anglexz=anglexz)</span>
+<span class="sd">        traces = rays.trace()   # calculate traces of rays</span>
+<span class="sd">        if settings.plot_rays:</span>
+<span class="sd">            rays.plot(ax, plot_type=settings.plot_type) # plot rays on canvas ax</span>
+<span class="sd">        plt.figure()</span>
+<span class="sd">        rays.plot_on_screen()   # how the cross section looks like on screen</span>
+<span class="sd">        plt.figure()</span>
+<span class="sd">        rays.count_rays_in_pixels()   # calculate spectras and so on</span>
+<span class="sd">        plt.show()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transmission_line</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span> <span class="o">=</span> <span class="n">transmission_line</span>
+        <span class="n">acceptance_angles_of_tran_line</span> <span class="o">=</span> <span class="n">transmission_line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">calculate_acceptance_angle</span><span class="p">(</span><span class="n">return_min_max</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span> <span class="o">=</span> <span class="n">input_gen</span><span class="o">.</span><span class="n">generate_input_spectrum</span><span class="p">(</span><span class="n">acceptance_angles_of_tran_line</span><span class="p">)</span>
+
+        <span class="c1"># self.spectrum = interpol.generate_gaussian_spectrum(settings.wav_min, settings.wav_max, mu=10, sig=5,</span>
+        <span class="c1">#                                                     no_of_values=settings.no_of_spectrum_points)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformed_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Ray transmission_line not set&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_other</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_atmosphere</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">min_wav</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">max_wav</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">cm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;nipy_spectral&#39;</span><span class="p">)</span>
+        <span class="n">cNorm</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">min_wav</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">max_wav</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_map_rgba</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">cmx</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">cNorm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cm</span><span class="p">)</span><span class="o">.</span><span class="n">to_rgba</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Rays.add_ray"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.add_ray">[docs]</a>    <span class="k">def</span> <span class="nf">add_ray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">anglexy</span><span class="p">,</span> <span class="n">anglexz</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds single ray to others, when wavelength == -1 then it adds ray for every wavelength, defined in settings,</span>
+<span class="sd">        in the other case it adds single ray with certain wavelength</span>
+
+<span class="sd">        :param np.array position: [x,y,z] starting position of ray</span>
+<span class="sd">        :param float anglexy:</span>
+<span class="sd">        :param float anglexz:</span>
+<span class="sd">        :param float wavelength:</span>
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">wavelength</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">wavelengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">position</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">),</span> <span class="mi">3</span><span class="p">),</span> <span class="n">position</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">)),</span> <span class="n">anglexy</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">)),</span> <span class="n">anglexz</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">,</span> <span class="n">wavelengths</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_other</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">))),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="p">[</span><span class="n">position</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span><span class="p">,</span> <span class="p">[</span><span class="n">anglexy</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span><span class="p">,</span> <span class="p">[</span><span class="n">anglexz</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">,</span> <span class="p">[</span><span class="n">wavelength</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_other</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_other</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Rays.add_rays"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.add_rays">[docs]</a>    <span class="k">def</span> <span class="nf">add_rays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">anglexy</span><span class="p">,</span> <span class="n">anglexz</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create array of rays, erasing previous if were any, from every position which is given it is creating many rays</span>
+<span class="sd">        of different wavelengths, they are defined by ranges and number of points between in settings</span>
+
+<span class="sd">        :param np.array positions:</span>
+<span class="sd">        :param np.array anglexy:</span>
+<span class="sd">        :param np.array anglexz:</span>
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wavelengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">anglexy</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">anglexz</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">wavelengths</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace_length_in_other</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Rays.trace"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.trace">[docs]</a>    <span class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate paths of all rays, returns 3D array with points of collisions on every component, in settings can be</span>
+<span class="sd">        set to erase not fitting rays, which goes outside mirror, transforms energies of rays</span>
+
+<span class="sd">        :return: (np.array) trace_points</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">])</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="p">:</span>
+            <span class="n">fitting_mask</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">interact_with_obj_vectorized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="c1"># obj.transform_energies_vectorized(self)     # transform energies</span>
+            <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">show_all_rays</span><span class="p">:</span>
+                <span class="n">fitting_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="c1"># if not break_flag:</span>
+            <span class="c1">#     break</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Current mirror: &quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;fitting: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">fitting_mask</span><span class="p">))</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anglesXY</span><span class="p">[</span><span class="n">fitting_mask</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">anglesXZ</span><span class="p">[</span><span class="n">fitting_mask</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="n">fitting_mask</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">[</span><span class="n">fitting_mask</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[:,</span> <span class="n">fitting_mask</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">fitting_mask</span><span class="p">]</span>
+            <span class="c1"># self.trace_length += np.sqrt((self.trace_points[-2, 0] - self.position[0]) ** 2</span>
+            <span class="c1">#                              + (self.trace_points[-2, 1] - self.position[1]) ** 2)</span>
+        <span class="c1"># if settings.air_rays_air_interaction:</span>
+        <span class="c1">#     self.calculate_transition_characteristics()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span></div>
+
+<div class="viewcode-block" id="Rays.plot_cross_section_on_element"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.plot_cross_section_on_element">[docs]</a>    <span class="k">def</span> <span class="nf">plot_cross_section_on_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_of_obj_in_list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to plot transverse cross section of rays on certain element of transmission line, usually used to plot</span>
+<span class="sd">        rays on screen, but can plot on other elements as well, as far as obj.plot_cross_section_on_obj() is defined</span>
+<span class="sd">        as far it is not well defined for all elements.</span>
+
+<span class="sd">        Note: Does not create new figure, just taking axes from current one.</span>
+
+<span class="sd">        :param int num_of_obj_in_list: number of element of transmission line</span>
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="p">[</span><span class="n">num_of_obj_in_list</span><span class="p">]</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">plot_cross_section_on_obj</span><span class="p">(</span><span class="n">ax1</span><span class="p">)</span>
+        <span class="n">plane_cross_counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_of_obj_in_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;Prism&#39;</span><span class="p">:</span>
+                <span class="n">plane_cross_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">xs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="n">num_of_obj_in_list</span> <span class="o">+</span> <span class="n">plane_cross_counter</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">obj</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="n">num_of_obj_in_list</span> <span class="o">+</span> <span class="n">plane_cross_counter</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">obj</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># which side of center</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">xs</span> <span class="o">*</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">normal_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">ys</span> <span class="o">*</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">normal_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">signation</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="c1"># np.cos(np.pi - obj.angle)</span>
+        <span class="n">coords_x</span> <span class="o">=</span> <span class="n">signation</span> <span class="o">*</span> \
+                   <span class="n">tools</span><span class="o">.</span><span class="n">get_euclidean_distance</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">position</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="n">num_of_obj_in_list</span> <span class="o">+</span> <span class="n">plane_cross_counter</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="c1"># print(coords_x)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">coords_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="n">num_of_obj_in_list</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">],</span>
+                    <span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color_map_rgba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Rays.plot_on_screen"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.plot_on_screen">[docs]</a>    <span class="k">def</span> <span class="nf">plot_on_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to plot rays collision points on screen,</span>
+
+<span class="sd">        plt.figure()</span>
+<span class="sd">        Note: Creates it&#39;s own figure</span>
+
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plot_cross_section_on_element</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+    <span class="c1"># def calculate_transition_characteristics(self):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Should be changed,</span>
+    <span class="c1">#</span>
+    <span class="c1">#     Calculate air transmission characteristic and transform rays energies</span>
+    <span class="c1">#</span>
+    <span class="c1">#     :return: none</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     distances = np.sqrt(np.sum((self.trace_points[:, :-1, :]-self.trace_points[:, 1:, :])**2))</span>
+    <span class="c1">#     self.trace_length_in_atmosphere = np.mean(distances)</span>
+    <span class="c1">#     self.trace_length_in_atmosphere -= np.mean(self.trace_length_in_other)</span>
+    <span class="c1">#     print(self.trace_length_in_atmosphere)</span>
+    <span class="c1">#     char = Behapi(temperature_celsius=20, pressure_pa=101325,</span>
+    <span class="c1">#                   relative_humidity=20, atmosphere=&#39;air&#39;)</span>
+    <span class="c1">#     char.absorption_coefficient(method=&#39;sdvoigt&#39;, wavelength_range_um=[settings.wav_min, settings.wav_max],</span>
+    <span class="c1">#                                 wavelength_step_um=(settings.wav_max - settings.wav_min) /</span>
+    <span class="c1">#                                 settings.no_of_spectrum_points)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     air_transmission = char.transmittance(distance_cm=self.trace_length_in_atmosphere/10,</span>
+    <span class="c1">#                                           desired_wavelengths=self.spectrum[:, 0])</span>
+    <span class="c1">#     self.energies *= air_transmission[np.searchsorted(self.spectrum[:, 0], self.wavelengths)]</span>
+    <span class="c1">#     self.transformed_spectrum *= air_transmission</span>
+
+<div class="viewcode-block" id="Rays.count_rays_in_pixels"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.count_rays_in_pixels">[docs]</a>    <span class="k">def</span> <span class="nf">count_rays_in_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Counts how many each rays fall on which pixels on screen, returns 2d histogram, first axis - num of pixel,</span>
+<span class="sd">        second axis - wavelength, in second returned variable are bins for wavelengths</span>
+
+<span class="sd">        :return: (np.array, np.array) 2d histogram, wavelength bins of histogram</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">screen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># sort rays by distance from left side</span>
+        <span class="n">index_offset</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">screen_show_behind</span><span class="p">:</span>
+            <span class="n">index_offset</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">xs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="o">-</span><span class="n">index_offset</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">screen</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="o">-</span><span class="n">index_offset</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">screen</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># which side of center</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">xs</span> <span class="o">*</span> <span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">normal_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">ys</span> <span class="o">*</span> <span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">normal_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">signation</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">coords_x</span> <span class="o">=</span> <span class="n">signation</span> <span class="o">*</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_euclidean_distance</span><span class="p">(</span>
+            <span class="n">screen</span><span class="o">.</span><span class="n">position</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[</span><span class="o">-</span><span class="n">index_offset</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">coords_x</span><span class="p">)</span>
+        <span class="n">coords_x</span> <span class="o">=</span> <span class="n">coords_x</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">]</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">]</span>
+        <span class="n">wavelengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">[</span><span class="n">sorted_indices</span><span class="p">]</span>
+        <span class="n">cells_ranges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">screen</span><span class="o">.</span><span class="n">diameter</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">diameter</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_pixels</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ranges_in_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">coords_x</span><span class="p">,</span> <span class="n">cells_ranges</span><span class="p">)</span>
+        <span class="n">spectral_histogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">settings</span><span class="o">.</span><span class="n">no_of_pixels</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span><span class="p">))</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">no_of_pixels</span><span class="p">):</span>
+            <span class="n">current_wavs</span> <span class="o">=</span> <span class="n">wavelengths</span><span class="p">[</span><span class="n">ranges_in_coords</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">ranges_in_coords</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">current_energies</span> <span class="o">=</span> <span class="n">energies</span><span class="p">[</span><span class="n">ranges_in_coords</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">ranges_in_coords</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="n">hist</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">current_wavs</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">wav_min</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">wav_max</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">weights</span><span class="o">=</span><span class="n">current_energies</span><span class="p">)</span>
+            <span class="n">spectral_histogram</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">hist</span>
+        <span class="k">return</span> <span class="n">spectral_histogram</span><span class="p">,</span> <span class="n">bins</span></div>
+
+<div class="viewcode-block" id="Rays.plot_characteristics"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.plot_characteristics">[docs]</a>    <span class="k">def</span> <span class="nf">plot_characteristics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for plotting characteristics</span>
+
+<span class="sd">        Note: Creates two figures</span>
+
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">histogram</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_rays_in_pixels</span><span class="p">()</span>
+        <span class="n">average_energy</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+        <span class="n">av_divider</span> <span class="o">=</span> <span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">no_of_rays</span> <span class="o">*</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span> <span class="o">/</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_pixels</span><span class="p">)</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">wav_max</span> <span class="o">+</span> <span class="n">settings</span><span class="o">.</span><span class="n">wav_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_how_many_pixels_shown</span><span class="p">):</span>
+            <span class="n">hist</span> <span class="o">=</span> <span class="n">histogram</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_pixels</span> <span class="o">//</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_how_many_pixels_shown</span><span class="p">]</span>
+            <span class="n">xs</span> <span class="o">=</span> <span class="p">(</span><span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">hist</span><span class="p">,</span> <span class="n">zs</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">zdir</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color_map_rgba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span>
+                   <span class="n">width</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelength[um]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Pixel&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">wav_max</span> <span class="o">-</span> <span class="n">settings</span><span class="o">.</span><span class="n">wav_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">no_of_spectrum_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original spectrum&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformed_spectrum</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Transformed spectrum&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">step</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">wav_min</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">wav_max</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_pixels</span><span class="p">),</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">histogram</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">av_divider</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
+                 <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Simulated output of detector&quot;</span><span class="p">)</span>
+        <span class="c1"># try:</span>
+        <span class="c1">#     group = settings.no_of_rays</span>
+        <span class="c1">#     # average_energy = self.energies[sorted_indices].reshape(-1, group).mean(axis=1)</span>
+        <span class="c1">#     # plt.plot(self.spectrum[:, 0], average_energy, &#39;b&#39;, label=&quot;Average energy spatially distributed&quot;)</span>
+        <span class="c1"># except:</span>
+        <span class="c1">#     raise Warning(&quot;Not all rays arrived to screen&quot;)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelength [um]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Rays.plot"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots rays on ax canvas</span>
+
+<span class="sd">        :param plt.axes ax: matplotlib figure axes object</span>
+<span class="sd">        :param string plot_type: &#39;2d&#39; or &#39;3d&#39; types avaiable</span>
+<span class="sd">        :return: none</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_points</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="c1"># ax.scatter(trace[:, 0], trace[:, 1], trace[:, 2])</span>
+            <span class="k">if</span> <span class="n">plot_type</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trace</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">trace</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">trace</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color_map_rgba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">trace</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">trace</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">color_map_rgba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Rays.transform_energies"><a class="viewcode-back" href="../rays.html#transmission_line.Rays.transform_energies">[docs]</a>    <span class="k">def</span> <span class="nf">transform_energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform rays energies by generating transformation of whole line</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">transformation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transmission_line</span><span class="o">.</span><span class="n">get_transformation_of_whole_line</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">*=</span> <span class="n">transformation</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spectrum</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">wavelengths</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformed_spectrum</span> <span class="o">*=</span> <span class="n">transformation</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># mirrors have absolute angle of rotation</span>
+    <span class="c1"># line = TransmissionLine([</span>
+    <span class="c1">#     Vacuum(length=40),</span>
+    <span class="c1">#     FlatMirror(length=10, diameter=50, angle=np.pi / 4),</span>
+    <span class="c1">#     Vacuum(length=50),</span>
+    <span class="c1">#     FlatMirror(length=10, diameter=50, angle=np.pi + np.pi / 4),</span>
+    <span class="c1">#     Vacuum(length=50),</span>
+    <span class="c1">#     FlatMirror(length=10, diameter=50, angle=np.pi / 3),</span>
+    <span class="c1">#     Vacuum(length=50),</span>
+    <span class="c1">#     PrismZnSe(length=30, construction_angle_deg=27, angle_to_beam_deg=17, thickness=40),</span>
+    <span class="c1">#     Vacuum(length=200),</span>
+    <span class="c1">#     SphericalLens(length=10, diameter=60, focal_length=50),</span>
+    <span class="c1">#     Vacuum(length=100),</span>
+    <span class="c1">#     FlatMirror(length=10, diameter=50, angle=4.2*np.pi/6)</span>
+    <span class="c1"># ])</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">TransmissionLine</span><span class="p">([</span>
+        <span class="n">Air</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mf">50.8</span><span class="p">),</span>
+        <span class="n">ParabolicMirror</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">rfl</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">pfl</span><span class="o">=</span><span class="mf">25.4</span><span class="p">,</span> <span class="n">relative_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mirrored</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Air</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">70</span><span class="p">),</span>
+        <span class="n">ParabolicMirror</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">rfl</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">pfl</span><span class="o">=</span><span class="mf">25.4</span><span class="p">,</span> <span class="n">relative_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mirrored</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Air</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">50.8</span><span class="p">),</span>
+        <span class="n">ParabolicMirror</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">rfl</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">pfl</span><span class="o">=</span><span class="mf">25.4</span><span class="p">,</span> <span class="n">relative_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mirrored</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">Air</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">90</span><span class="p">),</span>
+        <span class="n">PrismZnSe</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">construction_angle_deg</span><span class="o">=</span><span class="mi">27</span><span class="p">,</span> <span class="n">relative_angle_deg</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="mi">40</span><span class="p">),</span>
+        <span class="n">Air</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mf">50.8</span><span class="p">),</span>
+        <span class="n">ParabolicMirror</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">rfl</span><span class="o">=</span><span class="mf">50.8</span><span class="p">,</span> <span class="n">pfl</span><span class="o">=</span><span class="mf">25.4</span><span class="p">,</span> <span class="n">relative_angle_deg</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mirrored</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">Air</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mf">50.8</span><span class="p">),</span>
+        <span class="n">Screen</span><span class="p">(</span><span class="n">diameter</span><span class="o">=</span><span class="mf">12.8</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">relative_angle_deg</span><span class="o">=-</span><span class="mi">38</span> <span class="o">-</span> <span class="mi">23</span><span class="p">)</span>
+        <span class="c1"># ParabolicMirror(diameter=50.8, rfl=50.8, pfl=25.4, relative_angle_deg=0, mirrored=False),</span>
+        <span class="c1"># Vacuum(length=50.8),</span>
+        <span class="c1"># Screen(diameter=12.8, height=2, relative_angle_deg=-40)</span>
+    <span class="p">])</span>
+    <span class="c1"># line = TransmissionLine([</span>
+    <span class="c1">#     Vacuum(length=0.1),</span>
+    <span class="c1">#         SphericalLens(diameter=60, focal_length=70),</span>
+    <span class="c1">#     Screen(diameter=12.8, height=2, relative_angle=0)</span>
+    <span class="c1"># ])</span>
+    <span class="n">line</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_type</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_type</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Acceptance_angles: &quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">calculate_acceptance_angle</span><span class="p">(</span><span class="n">return_min_max</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="c1"># spawn rays</span>
+    <span class="n">min_ray_trace_length</span> <span class="o">=</span> <span class="mi">100000</span>
+    <span class="n">max_ray_trace_length</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1">### Create object rays</span>
+    <span class="n">rays</span> <span class="o">=</span> <span class="n">Rays</span><span class="p">(</span><span class="n">transmission_line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="n">num_of_rays</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">no_of_rays</span>
+    <span class="c1"># anglexy = np.random.uniform(-0.2, 0.2, num_of_rays)</span>
+    <span class="c1"># anglexz = np.random.uniform(-0.1, 0.1, num_of_rays)</span>
+    <span class="c1"># anglexy = np.zeros(num_of_rays)+0.1</span>
+    <span class="c1"># anglexy[anglexy &lt; 0] += 2 * np.pi</span>
+    <span class="c1"># anglexz[anglexz &lt; 0] += 2 * np.pi</span>
+
+    <span class="c1">### Generate angles of cone shape beam</span>
+    <span class="n">positions</span><span class="p">,</span> <span class="n">anglexy</span><span class="p">,</span> <span class="n">anglexz</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">generate_circle_beam</span><span class="p">(</span><span class="n">num_of_rays</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">boundary_angle</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="c1"># anglexz = np.zeros(num_of_rays)+0.1</span>
+    <span class="c1"># plt.figure()</span>
+    <span class="c1"># plt.scatter(positions[:, 0], positions[:, 2])</span>
+    <span class="c1"># plt.show()</span>
+
+    <span class="c1">### Add rays with generated angles and starting position 0,0,0</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">add_rays</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_of_rays</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">anglexy</span><span class="o">=</span><span class="n">anglexy</span><span class="p">,</span> <span class="n">anglexz</span><span class="o">=</span><span class="n">anglexz</span><span class="p">)</span>
+    <span class="c1"># rays.add_rays(positions=np.random.uniform(-0.01, 0.01, [num_of_rays, 3]), anglexy=anglexy, anglexz=anglexz)</span>
+    <span class="c1"># rays.add_rays(positions=positions, anglexy=anglexy, anglexz=anglexz)</span>
+    <span class="n">traces</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_rays</span><span class="p">:</span>
+        <span class="n">rays</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_type</span><span class="p">)</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">plot_on_screen</span><span class="p">()</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">transform_energies</span><span class="p">()</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">plot_characteristics</span><span class="p">()</span>
+    <span class="c1"># plt.plot(line[1].tran_char_interp(np.arange(0.5, 50, 0.1)))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="c1"># print(line)</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

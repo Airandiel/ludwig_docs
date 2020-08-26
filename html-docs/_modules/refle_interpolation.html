@@ -1,0 +1,529 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>refle_interpolation &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>refle_interpolation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for refle_interpolation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Michał Porębski</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">interpolate</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">signal</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="nn">sym</span>
+
+
+<div class="viewcode-block" id="read_characteristics"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.read_characteristics">[docs]</a><span class="k">def</span> <span class="nf">read_characteristics</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;char_gold_unprotected.txt&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads characteristic from text file, file have to consist two columns, one with wavelength, second with intensity,</span>
+<span class="sd">    usually from 0 to 1, file can have headers, but they have to begin with &quot;[&quot; mark</span>
+
+<span class="sd">    :param str path: path to file</span>
+<span class="sd">    :return: (np.array) read data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,|</span><span class="se">\t</span><span class="s1">| |:|</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="normalize_characteristics"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.normalize_characteristics">[docs]</a><span class="k">def</span> <span class="nf">normalize_characteristics</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">shift_maximum</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalize data, 2D array, with two columns, it normalizes the second column, shift_maximum can shift maximum by some value</span>
+
+<span class="sd">    :param np.array data: 2 column np.array</span>
+<span class="sd">    :param float shift_maximum: Optional, how much shift maximum, default 0</span>
+<span class="sd">    :return: (np.array) data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">data_normalized</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">data_normalized</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># shifting to positive</span>
+    <span class="n">data_normalized</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+        <span class="n">data_normalized</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">shift_maximum</span>  <span class="c1"># unification, plus 0.05 to not exceed 0.95% of reflectance</span>
+    <span class="k">return</span> <span class="n">data_normalized</span></div>
+
+
+<div class="viewcode-block" id="polynomial_interpolation"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.polynomial_interpolation">[docs]</a><span class="k">def</span> <span class="nf">polynomial_interpolation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># 7 was found to be the best for such curve</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find polynomial interpolation of data, returns polynomial coefficients</span>
+
+<span class="sd">    :param np.array data: 2 column np.array, first column Xs, second Ys</span>
+<span class="sd">    :param int deg: Optional, degree of polynomial, default 7</span>
+<span class="sd">    :param bool plot: Optional, flag to turn on/off plotting, default False</span>
+<span class="sd">    :return: (np.array) coefficients of polynomials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="c1"># ### you can turn plot True to plot some estimations</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>  <span class="c1"># plot original</span>
+        <span class="c1"># for i in range(2,3):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">deg</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelength [nm]&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Reflectance&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="c1"># poly = np.poly1d(np.polyfit(x, y, deg))</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">deg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">poly</span></div>
+
+
+<div class="viewcode-block" id="fourier_interpolation"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.fourier_interpolation">[docs]</a><span class="k">def</span> <span class="nf">fourier_interpolation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fringes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1">#</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approximation using fourier transform to find sinusoids approximating data</span>
+
+<span class="sd">    :param np.array data: 2 column np.array, first column Xs, second Ys</span>
+<span class="sd">    :param int fringes: Optional, how many sinusoids to combine, default 10</span>
+<span class="sd">    :param bool plot: Optional, flag to turn on/off plotting, default False</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">F</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">F</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:])</span>  <span class="c1"># sort to get indices of highest amplitude, (without constant add 1)</span>
+
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftfreq</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">F</span><span class="p">))</span>  <span class="c1"># get frequency</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">F</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">ind</span><span class="p">[</span><span class="o">-</span><span class="n">fringes</span><span class="p">:]]</span>  <span class="c1"># only 10 with the highest amplitude</span>
+    <span class="c1"># signal = np.ones((x.size))        # not sure if it should be product or sum</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)):</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">+</span> <span class="n">i</span><span class="p">]]</span>
+        <span class="c1"># signal *= sinusoid(freq[i], np.abs(number), np.angle(number), x)</span>
+        <span class="n">signal</span> <span class="o">+=</span> <span class="n">sinusoid</span><span class="p">(</span><span class="n">freq</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">number</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">number</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>  <span class="c1"># reconstruction with sinusoids</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="c1"># plt.plot(x, signal)</span>
+        <span class="n">new_F</span> <span class="o">=</span> <span class="n">F</span> <span class="o">*</span> <span class="mi">0</span>
+        <span class="n">new_F</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="o">-</span><span class="n">fringes</span><span class="p">:]]</span> <span class="o">=</span> <span class="n">F</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="o">-</span><span class="n">fringes</span><span class="p">:]]</span>  <span class="c1"># reconstruction with ifft</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">new_F</span><span class="p">)</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="n">inverse</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">inverse</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">inverse</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Wavelength&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Reflectance&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span>  <span class="c1"># not known yet</span></div>
+
+
+<div class="viewcode-block" id="log_interp1d"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.log_interp1d">[docs]</a><span class="k">def</span> <span class="nf">log_interp1d</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span> <span class="n">yy</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logarithmic interpolation, returns lambda with interpolation</span>
+<span class="sd">    :param np.array xx: X values</span>
+<span class="sd">    :param np.array yy: Y values</span>
+<span class="sd">    :param str kind: Optional, Kind of interpolation, default &#39;linear&#39;, can be &#39;cubic&#39; the rest described in sp.interpolate.interp1d documentation</span>
+<span class="sd">    :return: callable log_interp</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span>
+    <span class="n">logy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">yy</span><span class="p">)</span>
+    <span class="n">lin_interp</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">logx</span><span class="p">,</span> <span class="n">logy</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span>
+    <span class="n">log_interp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">zz</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">lin_interp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">zz</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">log_interp</span></div>
+
+
+<div class="viewcode-block" id="logarythmic_interpolation"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.logarythmic_interpolation">[docs]</a><span class="k">def</span> <span class="nf">logarythmic_interpolation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># still do not know how to recover the function</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Logarithmic interpolation, returns lambda with interpolation, uses function log_interp1d(),</span>
+<span class="sd">        just wrap it for direct use with data</span>
+
+<span class="sd">        :param np.array data: 2 column np.array</span>
+<span class="sd">        :param bool plot: Optional, plotting flag, default False</span>
+<span class="sd">        :return: callable log_interp</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">interpolation</span> <span class="o">=</span> <span class="n">log_interp1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># np.arange(0.5, 20, 0.1)))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">interpolation</span></div>
+
+
+<div class="viewcode-block" id="linear_interpolation"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.linear_interpolation">[docs]</a><span class="k">def</span> <span class="nf">linear_interpolation</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">part_to_extrapolate</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Linear interpolation with extrapolation, for extrapolation it uses only some part of characteristics,</span>
+<span class="sd">    part_to_extrapolate determines the divider how much of lasts samples are taken into consideration,</span>
+<span class="sd">    for example 2 means half, 5 means one fifth of last samples</span>
+
+<span class="sd">    :param np.array data: 2 column np.array</span>
+<span class="sd">    :param float part_to_extrapolate: divider which determines how much samples are taken into extrapolation</span>
+<span class="sd">    :return: (callable) interpolation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_existing</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">y_existing</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">half_of_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_existing</span><span class="p">)</span> <span class="o">//</span> <span class="n">part_to_extrapolate</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">half_of_length</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:]</span> <span class="o">*</span> <span class="n">y_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:])</span> <span class="o">-</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:]))</span> <span class="o">/</span> \
+        <span class="p">(</span><span class="n">half_of_length</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y_existing</span><span class="p">[</span><span class="o">-</span><span class="n">half_of_length</span><span class="p">:])</span> <span class="o">-</span> <span class="n">m</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x_existing</span><span class="p">[:</span><span class="n">half_of_length</span><span class="p">]))</span> <span class="o">/</span> <span class="n">half_of_length</span>
+
+    <span class="c1"># lin_interp = sp.interpolate.interp1d(x, y, kind=&#39;linear&#39;, fill_value=&#39;extrapolate&#39;)</span>
+    <span class="c1"># lin_interp = lambda xx: extrap(xx, x, y, m, b)</span>
+    <span class="k">def</span> <span class="nf">lin_extrap</span><span class="p">(</span><span class="n">x_extr</span><span class="p">):</span>
+        <span class="n">y_extr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x_extr</span><span class="p">,</span> <span class="n">x_existing</span><span class="p">,</span> <span class="n">y_existing</span><span class="p">)</span>
+        <span class="n">y_extr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x_extr</span> <span class="o">&lt;</span> <span class="n">x_existing</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">x_extr</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">y_extr</span><span class="p">)</span>
+        <span class="n">y_extr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x_extr</span> <span class="o">&gt;</span> <span class="n">x_existing</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">x_extr</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">y_extr</span><span class="p">)</span>
+        <span class="n">y_extr</span><span class="p">[</span><span class="n">y_extr</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">y_extr</span>
+
+    <span class="k">return</span> <span class="n">lin_extrap</span></div>
+
+
+<div class="viewcode-block" id="extrap"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.extrap">[docs]</a><span class="k">def</span> <span class="nf">extrap</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">yp</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    np.interp function with linear extrapolation</span>
+
+<span class="sd">    :param np.array x: Xs which we are looking for</span>
+<span class="sd">    :param np.array xp: Xs which are defined</span>
+<span class="sd">    :param np.array yp: Ys which are defined</span>
+<span class="sd">    :param float m: coefficient of linear function, mx + b</span>
+<span class="sd">    :param float b: coefficient of linear function, mx + b</span>
+<span class="sd">    :return: (np.array) with extrapolated data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xp</span><span class="p">,</span> <span class="n">yp</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">xp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">xp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">y</span></div>
+
+
+<div class="viewcode-block" id="linear_regression"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.linear_regression">[docs]</a><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Linear function, with parameters</span>
+<span class="sd">    :param np.array x: Xs</span>
+<span class="sd">    :param float m: coefficient of linear function, mx + b</span>
+<span class="sd">    :param float b: coefficient of linear function, mx + b</span>
+<span class="sd">    :return: (np.array) value of function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">m</span> <span class="o">+</span> <span class="n">b</span></div>
+
+
+<div class="viewcode-block" id="sinusoid"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.sinusoid">[docs]</a><span class="k">def</span> <span class="nf">sinusoid</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates sinusoid with specific parameters, types depends on input, are flexible, can be np.array, can be numbers</span>
+
+<span class="sd">    :param freq:</span>
+<span class="sd">    :param amplitude:</span>
+<span class="sd">    :param phase:</span>
+<span class="sd">    :param x:</span>
+<span class="sd">    :return: value of sinusoid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">amplitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">freq</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">phase</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="gaussian"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.gaussian">[docs]</a><span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    generate gaussian peak with some parameters, for some Xs values</span>
+
+<span class="sd">    :param np.array x: Xs for which we want to generate values</span>
+<span class="sd">    :param float mu:</span>
+<span class="sd">    :param float sig:</span>
+<span class="sd">    :return: (np.array) values of gaussian</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)))</span></div>
+
+
+<span class="c1"># generate gaussian spectrum</span>
+<div class="viewcode-block" id="generate_gaussian_spectrum"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.generate_gaussian_spectrum">[docs]</a><span class="k">def</span> <span class="nf">generate_gaussian_spectrum</span><span class="p">(</span><span class="n">lowest_x</span><span class="p">,</span> <span class="n">highest_x</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">sig</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">no_of_values</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapped function &#39;gaussian&#39;, for generating gaussian spectrum, in some specific range of wavelengths</span>
+
+<span class="sd">    :param float lowest_x: lower border of Xs</span>
+<span class="sd">    :param float highest_x: upper border of Xs</span>
+<span class="sd">    :param float mu: Optional, properties of gaussian, default 1.5</span>
+<span class="sd">    :param float sig: Optional properties of gaussian, default 0.1</span>
+<span class="sd">    :param int no_of_values: Optional, number of points in spectrum, default 128</span>
+<span class="sd">    :param bool plot: plotting flag, default False</span>
+<span class="sd">    :return: (np.array) data, 2 column array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">no_of_values</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lowest_x</span><span class="p">,</span> <span class="n">highest_x</span><span class="p">,</span> <span class="n">no_of_values</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="interpolate_surface"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.interpolate_surface">[docs]</a><span class="k">def</span> <span class="nf">interpolate_surface</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolation of surface, from grid data</span>
+
+<span class="sd">    :param np.array grid: Grid data of surface</span>
+<span class="sd">    :return: (callable) interpolation lambda</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># return interpolate.interp2d(grid[:, 0], grid[:, 1], grid[: 2], kind=&#39;cubic&#39;)</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">griddata</span><span class="p">(</span><span class="n">grid</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">grid</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_line_from_vector"><a class="viewcode-back" href="../interpolation_tools.html#refle_interpolation.get_line_from_vector">[docs]</a><span class="k">def</span> <span class="nf">get_line_from_vector</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">,</span> <span class="n">angle_xz</span><span class="p">,</span> <span class="n">starting_point</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns lambda of line described by two angles and starting point, xy angle, like in spherical coordinate system,</span>
+<span class="sd">    xz angle like in spherical angle, but it is azimuth - pi/2</span>
+<span class="sd">    :param float angle_xy: single XY angle</span>
+<span class="sd">    :param float angle_xz: single XZ angle</span>
+<span class="sd">    :param np.array starting_point: single starting point</span>
+<span class="sd">    :return: callable line</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle_xy</span><span class="p">)</span> <span class="o">+</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                      <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">angle_xz</span><span class="p">)</span> <span class="o">+</span> <span class="n">starting_point</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span></div>
+    <span class="c1"># return lambda x: ((x - starting_point[:, 0]) * np.tan(angle_xy) + starting_point[:, 1])</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># data = read_characteristics()</span>
+    <span class="c1"># logarythmic_interpolation(data)</span>
+    <span class="c1"># fourier_interpolation(data, fringes=10,plot=True)</span>
+    <span class="c1"># x = data[:, 0]</span>
+    <span class="c1"># plt.plot(x, data[:, 1])</span>
+    <span class="c1"># input_spectrum = np.zeros(x.size)</span>
+    <span class="c1"># for beginning we have gaussian spectrum on input with width of 1um</span>
+    <span class="c1"># x.size / 19 because the spectrum of mirror is 20 um but starting from not zero</span>
+    <span class="c1"># input_spectrum[int(x.size / 19): 2 * int(x.size / 19)] = signal.gaussian(int(x.size / 19), std=int(x.size / 19 / 7))</span>
+    <span class="c1"># plt.plot(input_spectrum)</span>
+    <span class="c1"># poly = polynomial_interpolation(data, deg=10, plot=False)</span>
+    <span class="c1"># values = np.poly1d(poly)</span>
+    <span class="c1"># conv = np.convolve(data[:, 1], values(x))</span>
+    <span class="c1"># plt.plot(x, conv[:int(conv.size / 2)+1])</span>
+    <span class="n">generate_gaussian_spectrum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="c1"># print(values(data[:, 0]))</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

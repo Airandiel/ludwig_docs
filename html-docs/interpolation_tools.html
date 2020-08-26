@@ -1,0 +1,533 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Interpolation tools &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="HITRAN database access" href="behappy.html"/>
+        <link rel="prev" title="Tools" href="tools.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Interpolation tools</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interpolation_tools.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="behappy.html" class="btn btn-neutral float-right" title="HITRAN database access" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tools.html" class="btn btn-neutral" title="Tools" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-refle_interpolation">
+<span id="interpolation-tools"></span><h1>Interpolation tools<a class="headerlink" href="#module-refle_interpolation" title="Permalink to this headline">¶</a></h1>
+<p>Author: Michał Porębski</p>
+<dl class="function">
+<dt id="refle_interpolation.extrap">
+<code class="descclassname">refle_interpolation.</code><code class="descname">extrap</code><span class="sig-paren">(</span><em>x</em>, <em>xp</em>, <em>yp</em>, <em>m</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#extrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.extrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>np.interp function with linear extrapolation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>np.array</em>) – Xs which we are looking for</li>
+<li><strong>xp</strong> (<em>np.array</em>) – Xs which are defined</li>
+<li><strong>yp</strong> (<em>np.array</em>) – Ys which are defined</li>
+<li><strong>m</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – coefficient of linear function, mx + b</li>
+<li><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – coefficient of linear function, mx + b</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) with extrapolated data</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.fourier_interpolation">
+<code class="descclassname">refle_interpolation.</code><code class="descname">fourier_interpolation</code><span class="sig-paren">(</span><em>data</em>, <em>fringes=10</em>, <em>plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#fourier_interpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.fourier_interpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Approximation using fourier transform to find sinusoids approximating data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.array</em>) – 2 column np.array, first column Xs, second Ys</li>
+<li><strong>fringes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Optional, how many sinusoids to combine, default 10</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Optional, flag to turn on/off plotting, default False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.gaussian">
+<code class="descclassname">refle_interpolation.</code><code class="descname">gaussian</code><span class="sig-paren">(</span><em>x</em>, <em>mu</em>, <em>sig</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>generate gaussian peak with some parameters, for some Xs values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>np.array</em>) – Xs for which we want to generate values</li>
+<li><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>sig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) values of gaussian</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.generate_gaussian_spectrum">
+<code class="descclassname">refle_interpolation.</code><code class="descname">generate_gaussian_spectrum</code><span class="sig-paren">(</span><em>lowest_x</em>, <em>highest_x</em>, <em>mu=1.5</em>, <em>sig=0.1</em>, <em>no_of_values=128</em>, <em>plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#generate_gaussian_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.generate_gaussian_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapped function ‘gaussian’, for generating gaussian spectrum, in some specific range of wavelengths</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lowest_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – lower border of Xs</li>
+<li><strong>highest_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – upper border of Xs</li>
+<li><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Optional, properties of gaussian, default 1.5</li>
+<li><strong>sig</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Optional properties of gaussian, default 0.1</li>
+<li><strong>no_of_values</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Optional, number of points in spectrum, default 128</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – plotting flag, default False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) data, 2 column array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.get_line_from_vector">
+<code class="descclassname">refle_interpolation.</code><code class="descname">get_line_from_vector</code><span class="sig-paren">(</span><em>angle_xy</em>, <em>angle_xz</em>, <em>starting_point</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#get_line_from_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.get_line_from_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns lambda of line described by two angles and starting point, xy angle, like in spherical coordinate system,
+xz angle like in spherical angle, but it is azimuth - pi/2
+:param float angle_xy: single XY angle
+:param float angle_xz: single XZ angle
+:param np.array starting_point: single starting point
+:return: callable line</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.interpolate_surface">
+<code class="descclassname">refle_interpolation.</code><code class="descname">interpolate_surface</code><span class="sig-paren">(</span><em>grid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#interpolate_surface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.interpolate_surface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpolation of surface, from grid data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>grid</strong> (<em>np.array</em>) – Grid data of surface</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(callable) interpolation lambda</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.linear_interpolation">
+<code class="descclassname">refle_interpolation.</code><code class="descname">linear_interpolation</code><span class="sig-paren">(</span><em>data</em>, <em>part_to_extrapolate=2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#linear_interpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.linear_interpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear interpolation with extrapolation, for extrapolation it uses only some part of characteristics,
+part_to_extrapolate determines the divider how much of lasts samples are taken into consideration,
+for example 2 means half, 5 means one fifth of last samples</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.array</em>) – 2 column np.array</li>
+<li><strong>part_to_extrapolate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – divider which determines how much samples are taken into extrapolation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(callable) interpolation</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.linear_regression">
+<code class="descclassname">refle_interpolation.</code><code class="descname">linear_regression</code><span class="sig-paren">(</span><em>x</em>, <em>m</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#linear_regression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.linear_regression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear function, with parameters
+:param np.array x: Xs
+:param float m: coefficient of linear function, mx + b
+:param float b: coefficient of linear function, mx + b
+:return: (np.array) value of function</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.log_interp1d">
+<code class="descclassname">refle_interpolation.</code><code class="descname">log_interp1d</code><span class="sig-paren">(</span><em>xx</em>, <em>yy</em>, <em>kind='linear'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#log_interp1d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.log_interp1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logarithmic interpolation, returns lambda with interpolation
+:param np.array xx: X values
+:param np.array yy: Y values
+:param str kind: Optional, Kind of interpolation, default ‘linear’, can be ‘cubic’ the rest described in sp.interpolate.interp1d documentation
+:return: callable log_interp</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.logarythmic_interpolation">
+<code class="descclassname">refle_interpolation.</code><code class="descname">logarythmic_interpolation</code><span class="sig-paren">(</span><em>data</em>, <em>plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#logarythmic_interpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.logarythmic_interpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logarithmic interpolation, returns lambda with interpolation, uses function log_interp1d(),
+just wrap it for direct use with data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.array</em>) – 2 column np.array</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Optional, plotting flag, default False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">callable log_interp</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.normalize_characteristics">
+<code class="descclassname">refle_interpolation.</code><code class="descname">normalize_characteristics</code><span class="sig-paren">(</span><em>data</em>, <em>shift_maximum=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#normalize_characteristics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.normalize_characteristics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize data, 2D array, with two columns, it normalizes the second column, shift_maximum can shift maximum by some value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.array</em>) – 2 column np.array</li>
+<li><strong>shift_maximum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Optional, how much shift maximum, default 0</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) data</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.polynomial_interpolation">
+<code class="descclassname">refle_interpolation.</code><code class="descname">polynomial_interpolation</code><span class="sig-paren">(</span><em>data</em>, <em>deg=7</em>, <em>plot=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#polynomial_interpolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.polynomial_interpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find polynomial interpolation of data, returns polynomial coefficients</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<em>np.array</em>) – 2 column np.array, first column Xs, second Ys</li>
+<li><strong>deg</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Optional, degree of polynomial, default 7</li>
+<li><strong>plot</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Optional, flag to turn on/off plotting, default False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">(np.array) coefficients of polynomials</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.read_characteristics">
+<code class="descclassname">refle_interpolation.</code><code class="descname">read_characteristics</code><span class="sig-paren">(</span><em>path='char_gold_unprotected.txt'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#read_characteristics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.read_characteristics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads characteristic from text file, file have to consist two columns, one with wavelength, second with intensity,
+usually from 0 to 1, file can have headers, but they have to begin with “[” mark</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – path to file</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">(np.array) read data</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="refle_interpolation.sinusoid">
+<code class="descclassname">refle_interpolation.</code><code class="descname">sinusoid</code><span class="sig-paren">(</span><em>freq</em>, <em>amplitude</em>, <em>phase</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/refle_interpolation.html#sinusoid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#refle_interpolation.sinusoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates sinusoid with specific parameters, types depends on input, are flexible, can be np.array, can be numbers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>freq</strong> – </li>
+<li><strong>amplitude</strong> – </li>
+<li><strong>phase</strong> – </li>
+<li><strong>x</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">value of sinusoid</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="behappy.html" class="btn btn-neutral float-right" title="HITRAN database access" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tools.html" class="btn btn-neutral" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

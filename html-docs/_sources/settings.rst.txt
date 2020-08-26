@@ -1,0 +1,5 @@
+Settings
+=================
+Settings file for storing variables, some sections are influencing different files, tools are also using it. Use it with cautious.
+
+.. literalinclude:: ../../settings.py

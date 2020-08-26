@@ -1,0 +1,451 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Rays &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="Tools" href="tools.html"/>
+        <link rel="prev" title="Optical elements" href="transmission_line_obj.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="behappy.html">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Rays</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/rays.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="transmission_line_obj.html" class="btn btn-neutral" title="Optical elements" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-transmission_line">
+<span id="rays"></span><h1>Rays<a class="headerlink" href="#module-transmission_line" title="Permalink to this headline">¶</a></h1>
+<p>Author: Michał Porębski</p>
+<dl class="class">
+<dt id="transmission_line.Rays">
+<em class="property">class </em><code class="descclassname">transmission_line.</code><code class="descname">Rays</code><span class="sig-paren">(</span><em>transmission_line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Class which create rays which travels through transmission line.</dt>
+<dd><ul class="first last simple">
+<li>angleXZ - angle between ray and X axis, a bit differently than in spherical coordinates, from -pi/2 to pi/2, when 0 then is parallel to X axis</li>
+<li>angleXY - angle like in spherical coordinates</li>
+</ul>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_type</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_type</span><span class="p">)</span> <span class="c1"># get canvas for plotting, line is TransmissionLine instance</span>
+<span class="n">rays</span> <span class="o">=</span> <span class="n">Rays</span><span class="p">(</span><span class="n">transmission_line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>     <span class="c1"># line is TransmissionLine instance</span>
+<span class="n">num_of_rays</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">anglexy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">num_of_rays</span><span class="p">)</span>
+<span class="n">anglexz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">num_of_rays</span><span class="p">)</span>
+<span class="n">positions</span><span class="p">,</span> <span class="n">anglexy</span><span class="p">,</span> <span class="n">anglexz</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">generate_circle_beam</span><span class="p">(</span><span class="n">num_of_rays</span><span class="p">,</span> <span class="mf">0.002</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">rays</span><span class="o">.</span><span class="n">add_rays</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_of_rays</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">anglexy</span><span class="o">=</span><span class="n">anglexy</span><span class="p">,</span> <span class="n">anglexz</span><span class="o">=</span><span class="n">anglexz</span><span class="p">)</span>
+<span class="n">traces</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>   <span class="c1"># calculate traces of rays</span>
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">plot_rays</span><span class="p">:</span>
+    <span class="n">rays</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">plot_type</span><span class="p">)</span> <span class="c1"># plot rays on canvas ax</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">rays</span><span class="o">.</span><span class="n">plot_on_screen</span><span class="p">()</span>   <span class="c1"># how the cross section looks like on screen</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">rays</span><span class="o">.</span><span class="n">count_rays_in_pixels</span><span class="p">()</span>   <span class="c1"># calculate spectras and so on</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="transmission_line.Rays.add_ray">
+<code class="descname">add_ray</code><span class="sig-paren">(</span><em>position</em>, <em>anglexy</em>, <em>anglexz</em>, <em>wavelength=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.add_ray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.add_ray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds single ray to others, when wavelength == -1 then it adds ray for every wavelength, defined in settings,
+in the other case it adds single ray with certain wavelength</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>position</strong> (<em>np.array</em>) – [x,y,z] starting position of ray</li>
+<li><strong>anglexy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>anglexz</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>wavelength</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">none</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.add_rays">
+<code class="descname">add_rays</code><span class="sig-paren">(</span><em>positions</em>, <em>anglexy</em>, <em>anglexz</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.add_rays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.add_rays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create array of rays, erasing previous if were any, from every position which is given it is creating many rays
+of different wavelengths, they are defined by ranges and number of points between in settings</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>positions</strong> (<em>np.array</em>) – </li>
+<li><strong>anglexy</strong> (<em>np.array</em>) – </li>
+<li><strong>anglexz</strong> (<em>np.array</em>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">none</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.count_rays_in_pixels">
+<code class="descname">count_rays_in_pixels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.count_rays_in_pixels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.count_rays_in_pixels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Counts how many each rays fall on which pixels on screen, returns 2d histogram, first axis - num of pixel,
+second axis - wavelength, in second returned variable are bins for wavelengths</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(np.array, np.array) 2d histogram, wavelength bins of histogram</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>ax</em>, <em>plot_type='3d'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots rays on ax canvas</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ax</strong> (<em>plt.axes</em>) – matplotlib figure axes object</li>
+<li><strong>plot_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) – ‘2d’ or ‘3d’ types avaiable</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">none</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.plot_characteristics">
+<code class="descname">plot_characteristics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.plot_characteristics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.plot_characteristics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for plotting characteristics</p>
+<p>Note: Creates two figures</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">none</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.plot_cross_section_on_element">
+<code class="descname">plot_cross_section_on_element</code><span class="sig-paren">(</span><em>num_of_obj_in_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.plot_cross_section_on_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.plot_cross_section_on_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to plot transverse cross section of rays on certain element of transmission line, usually used to plot
+rays on screen, but can plot on other elements as well, as far as obj.plot_cross_section_on_obj() is defined
+as far it is not well defined for all elements.</p>
+<p>Note: Does not create new figure, just taking axes from current one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num_of_obj_in_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – number of element of transmission line</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">none</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.plot_on_screen">
+<code class="descname">plot_on_screen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.plot_on_screen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.plot_on_screen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to plot rays collision points on screen,</p>
+<p>plt.figure()
+Note: Creates it’s own figure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">none</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.trace">
+<code class="descname">trace</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.trace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.trace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate paths of all rays, returns 3D array with points of collisions on every component, in settings can be
+set to erase not fitting rays, which goes outside mirror, transforms energies of rays</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">(np.array) trace_points</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="transmission_line.Rays.transform_energies">
+<code class="descname">transform_energies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/transmission_line.html#Rays.transform_energies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#transmission_line.Rays.transform_energies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform rays energies by generating transformation of whole line
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tools.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="transmission_line_obj.html" class="btn btn-neutral" title="Optical elements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>

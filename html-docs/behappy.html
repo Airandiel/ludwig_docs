@@ -1,0 +1,381 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HITRAN database access &mdash; Ludwik 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/jquery.fancybox.min.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/glpi.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Ludwik 0.0.1 documentation" href="index.html"/>
+        <link rel="next" title="Generating of input spectrum" href="input_gen.html"/>
+        <link rel="prev" title="Interpolation tools" href="interpolation_tools.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Ludwik
+          
+
+          
+          </a>
+
+          
+            
+              <div class="version">
+                0.0.1
+
+                
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="transmission_line.html">Transmission line</a></li>
+<li class="toctree-l1"><a class="reference internal" href="transmission_line_obj.html">Optical elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rays.html">Rays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interpolation_tools.html">Interpolation tools</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">HITRAN database access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="input_gen.html">Generating of input spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">Settings</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Ludwik</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>HITRAN database access</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/behappy.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
+        <a href="input_gen.html" class="btn btn-neutral float-right" title="Generating of input spectrum" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="interpolation_tools.html" class="btn btn-neutral" title="Interpolation tools" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+  </div>
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-behapi">
+<span id="hitran-database-access"></span><h1>HITRAN database access<a class="headerlink" href="#module-behapi" title="Permalink to this headline">¶</a></h1>
+<p>Author: Natalia Stalmach
+Hitran database: <a class="reference external" href="https://hitran.org/">https://hitran.org/</a></p>
+<p>Air compounds: <a class="reference external" href="https://www.thoughtco.com/chemical-composition-of-air-604288">https://www.thoughtco.com/chemical-composition-of-air-604288</a></p>
+<p>Humidity calculations: <a class="reference external" href="https://www.aqua-calc.com/calculate/humidity">https://www.aqua-calc.com/calculate/humidity</a></p>
+<dl class="class">
+<dt id="behapi.Behapi">
+<em class="property">class </em><code class="descclassname">behapi.</code><code class="descname">Behapi</code><span class="sig-paren">(</span><em>temperature_celsius</em>, <em>pressure_pa</em>, <em>relative_humidity</em>, <em>atmosphere</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/behapi.html#Behapi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#behapi.Behapi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class Behapi consist of methods for using data from HITRAN database for calculating transmittance spectrum
+for object with defined temperature, pressure, relative humidity and gas mixture.</p>
+<p>Example of use:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">=</span> <span class="n">Behapi</span><span class="p">(</span><span class="n">temperature_celsius</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">pressure_pa</span><span class="o">=</span><span class="mi">101325</span><span class="p">,</span>
+          <span class="n">relative_humidity</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">atmosphere</span><span class="o">=</span><span class="s1">&#39;nitrogen&#39;</span><span class="p">)</span>
+<span class="n">char</span><span class="o">.</span><span class="n">absorption_coefficient</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;sdvoigt&#39;</span><span class="p">,</span> <span class="n">wavelength_range_um</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="n">wavelength_step_um</span><span class="o">=</span><span class="mf">0.00005</span><span class="p">)</span>
+<span class="c1"># deswave = np.arange(2.5, 20, 17.5/2000)</span>
+<span class="n">deswave</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">0.00005</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span>
+    <span class="s1">&#39;Transmittance spectrum for nitrogen environment with 20°C temperature, 1013.25Pa pressure, 20</span><span class="si">% r</span><span class="s1">elative humidity and 30cm beam path&#39;</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Wavelength [$\mu m$]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Transmittance&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">deswave</span><span class="p">,</span> <span class="n">char</span><span class="o">.</span><span class="n">transmittance</span><span class="p">(</span><span class="n">distance_cm</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">desired_wavelengths</span><span class="o">=</span><span class="n">deswave</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;transmittance.svg&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="behapi.Behapi.absorption_coefficient">
+<code class="descname">absorption_coefficient</code><span class="sig-paren">(</span><em>method, wavelength_range_um=[2.5, 20], wavelength_step_um=5e-05, wavelength_step_doppler_um=5e-06</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/behapi.html#Behapi.absorption_coefficient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#behapi.Behapi.absorption_coefficient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for calculating absorption coefficient, having predefined lineshape (method) and desired wavelengths
+- converts given wavelength range and wavelength step to wavenumbers</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) – method of calculating transmittance spectrum based on taken lineshape - ‘voigt’, ‘doppler’ or ‘sdvoigt’ (required)</li>
+<li><strong>wavelength_range_um</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – wavelength range in which transmittance spectrum should be calculated given in um, default is [2.5, 20] (optional)</li>
+<li><strong>wavelength_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – wavelength step given in um, default is 0.00005 (optional)</li>
+<li><strong>wavelength_step_doppler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – wavelength step for Doppler method given in um, default is 0.000005 (optional)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="behapi.Behapi.absorption_coefficient_air">
+<code class="descname">absorption_coefficient_air</code><span class="sig-paren">(</span><em>method</em>, <em>wavenumber_range</em>, <em>wavenumber_step</em>, <em>wavenumber_step_doppler</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/behapi.html#Behapi.absorption_coefficient_air"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#behapi.Behapi.absorption_coefficient_air" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary method for absorption_coefficient(), designed for objects with air atmosphere, based on wavenumber notation
+- updates database basing on the newest data form hitran, checks if every necessery data is available and if not downloads it
+- with given lineshape (method) calculates proper absorption coefficient</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) – method of calculating transmittance spectrum based on taken lineshape - ‘voigt’, ‘doppler’ or ‘sdvoigt’ (required)</li>
+<li><strong>wavenumber_range</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – wavenumber range in which transmittance spectrum should be calculated given in cm-1 (optional)</li>
+<li><strong>wavenumber_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – wavenumber step given in cm-1 (optional)</li>
+<li><strong>wavenumber_step_doppler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – wavenumber step for Doppler method given in cm-1 (optional)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="behapi.Behapi.absorption_coefficient_nitrogen">
+<code class="descname">absorption_coefficient_nitrogen</code><span class="sig-paren">(</span><em>method</em>, <em>wavenumber_range</em>, <em>wavenumber_step</em>, <em>wavenumber_step_doppler</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/behapi.html#Behapi.absorption_coefficient_nitrogen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#behapi.Behapi.absorption_coefficient_nitrogen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auxiliary method for absorption_coefficient(), designed for objects with nitrogen atmosphere, based on wavenumber notation
+- updates database basing on the newest data form hitran, checks if every necessery data is available and if not downloads it
+- with given lineshape (method) calculates proper absorption coefficient</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) – method of calculating transmittance spectrum based on taken lineshape - ‘voigt’, ‘doppler’ or ‘sdvoigt’ (required)</li>
+<li><strong>wavenumber_range</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – wavenumber range in which transmittance spectrum should be calculated given in cm-1 (optional)</li>
+<li><strong>wavenumber_step</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – wavenumber step given in cm-1 (optional)</li>
+<li><strong>wavenumber_step_doppler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – wavenumber step for Doppler method given in cm-1 (optional)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="behapi.Behapi.transmittance">
+<code class="descname">transmittance</code><span class="sig-paren">(</span><em>distance_cm</em>, <em>desired_wavelengths</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/behapi.html#Behapi.transmittance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#behapi.Behapi.transmittance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method returns transmittance spectrum for given environment in given wavelength range.
+Default values of wavelength step are chosen basing on hapi documentation (in wavenumber 0.01 and 0.001 respectively).
+It’s not recommended to go above those values because of possible accuracy decline.
+Maximum wavelength range is [0.5, 50] um because of database which is downloaded for this range - if needed it can be changed in the code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>distance_cm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – distance traveled by beam given in cm (required)</li>
+<li><strong>array desired_wavelengths</strong> (<em>numpy</em>) – numpy array of wavelengths which the user needs, given in um (required)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Return numpy array transmittance:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><p class="first last">values of transmittance for desired wavelengths in numpy array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="input_gen.html" class="btn btn-neutral float-right" title="Generating of input spectrum" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="interpolation_tools.html" class="btn btn-neutral" title="Interpolation tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Juliusz Stanislaw Tarnowski, Michal Porebski, Natalia Stalmach, Milosz Lepak.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/jquery.fancybox.min.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+  <script type="text/javascript">
+    $(function(){
+      $('.image-reference').fancybox();
+    })
+  </script>
+
+</body>
+</html>
